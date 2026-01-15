@@ -56,8 +56,8 @@ export default function LoginScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.emoji}>👋</Text>
-          <Text style={styles.title}>Bon retour!</Text>
-          <Text style={styles.subtitle}>Connectez-vous à votre compte</Text>
+          <Text style={styles.title}>Welcome back!</Text>
+          <Text style={styles.subtitle}>Sign in to your account</Text>
         </View>
 
         <View style={styles.form}>
@@ -75,7 +75,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Mot de passe</Text>
+            <Text style={styles.label}>Password</Text>
             <TextInput
               style={styles.input}
               placeholder="••••••••"
@@ -95,14 +95,14 @@ export default function LoginScreen() {
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Se connecter</Text>
+              <Text style={styles.buttonText}>Sign in</Text>
             )}
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Pas encore de compte? </Text>
+            <Text style={styles.footerText}>Don't have an account? </Text>
             <TouchableOpacity onPress={() => router.push('/register')}>
-              <Text style={styles.link}>Créer un compte</Text>
+              <Text style={styles.link}>Create an account</Text>
             </TouchableOpacity>
           </View>
 
@@ -110,7 +110,7 @@ export default function LoginScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Text style={styles.backButtonText}>← Retour</Text>
+            <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

@@ -1,307 +1,252 @@
-# 🍽️ Achban-Lik
-
-**Restaurant Review Mobile Application** - A full-stack training project for learning mobile development
-
-## 📱 Overview
-
-Achban-Lik is a mobile application that allows users to discover restaurants, read reviews, and share their dining experiences. Admin users can manage the restaurant database, while regular users can add one review per restaurant.
-
-> ⚠️ **Educational Project**: This application is built for learning purposes and demonstrates modern mobile development practices.
-
-## ✨ Features
-
-### For Users
-- ✅ Browse restaurant listings with filters
-- ✅ View detailed restaurant information
-- ✅ Read and write reviews (one per restaurant)
-- ✅ Edit and delete own reviews
-- ✅ View all personal reviews in one place
-- ✅ Filter restaurants by city
-- ✅ See aggregated ratings
-
-### For Admins
-- ✅ Full restaurant CRUD operations
-- ✅ Upload restaurant images
-- ✅ Manage all restaurant data
-- ✅ All user features included
-
-## 🛠️ Tech Stack
-
-### Backend
-- **Runtime**: Node.js with Express
-- **Database**: SQLite with Sequelize ORM
-- **Authentication**: JWT tokens
-- **File Upload**: Multer
-- **Validation**: express-validator
-- **Password Hashing**: bcryptjs
-
-### Frontend
-- **Framework**: React Native with Expo
-- **Navigation**: Expo Router
-- **State Management**: Zustand
-- **Data Fetching**: React Query
-- **HTTP Client**: Axios
-- **Storage**: Expo SecureStore
-- **Image Handling**: Expo Image Picker
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- Expo CLI (will be installed with dependencies)
-- Mobile device with Expo Go app OR emulator
-
-### Installation
-
-1. **Clone or navigate to the project**
-   ```bash
-   cd achban-lik
-   ```
-
-2. **Setup Backend**
-   ```bash
-   cd backend
-   npm install
-   npm run seed     # Seed database with demo data
-   npm run dev      # Start backend server
-   ```
-
-3. **Setup Frontend** (in a new terminal)
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-4. **Configure API URL**
-   
-   Edit `frontend/config/api.js` and update the API URL:
-   
-   ```javascript
-   // For physical device (replace with your IP)
-   const API_BASE_URL = 'http://192.168.1.X:3000/api';
-   
-   // For Android emulator
-   const API_BASE_URL = 'http://10.0.2.2:3000/api';
-   
-   // For iOS simulator
-   const API_BASE_URL = 'http://localhost:3000/api';
-   ```
-
-5. **Start Frontend**
-   ```bash
-   npm start
-   ```
-
-6. **Run on your device**
-   - Scan QR code with Expo Go app (iOS/Android)
-   - Press 'a' for Android emulator
-   - Press 'i' for iOS simulator
-
-## 👥 Demo Accounts
-
-The seeded database includes these accounts:
-
-### Admin Account
-- **Email**: `admin@achbanlik.com`
-- **Password**: `admin123`
-
-### Regular User
-- **Email**: `ahmed@example.com`
-- **Password**: `password123`
-
-## 📂 Project Structure
-
-```
-achban-lik/
-├── backend/
-│   ├── controllers/        # Business logic
-│   ├── middleware/         # Auth & upload middleware
-│   ├── models/            # Sequelize models
-│   ├── routes/            # API routes
-│   ├── seeders/           # Database seeders
-│   ├── uploads/           # Uploaded images
-│   └── server.js          # Entry point
-│
-└── frontend/
-    ├── app/               # Expo Router screens
-    ├── assets/            # Images and icons
-    ├── config/            # API configuration
-    ├── store/             # Zustand stores
-    └── package.json
-```
-
-## 🎯 Learning Objectives
-
-This project demonstrates:
-
-1. **Mobile Development**
-   - React Native fundamentals
-   - Expo ecosystem
-   - File-based routing with Expo Router
-   - Mobile UI/UX best practices
-
-2. **State Management**
-   - Client state with Zustand
-   - Server state with React Query
-   - Authentication flow
-   - Cache management
-
-3. **Backend Development**
-   - RESTful API design
-   - MVC architecture
-   - Database relationships
-   - Authentication & authorization
-   - File uploads
-
-4. **Full-Stack Integration**
-   - API communication
-   - Token-based auth
-   - Image handling
-   - Error handling
-   - Data validation
-
-## 📱 Application Screens
-
-### Authentication Flow
-1. **Splash Screen** → Auto redirects after 2s
-2. **Auth Choice** → Login or Register
-3. **Login/Register** → Create account or sign in
-
-### Main App Flow
-1. **Restaurants List** → Browse all restaurants
-2. **Restaurant Details** → View info and reviews
-3. **Add/Edit Review** → Share your experience
-4. **My Reviews** → Manage your reviews
-5. **Admin Panel** → Manage restaurants (admin only)
-
-## 🔐 Security Features
-
-- Password hashing with bcrypt
-- JWT token authentication
-- Secure token storage
-- Role-based access control
-- Protected API routes
-- Input validation
-
-## 📊 Database Schema
-
-### User
-- id, name, email, password (hashed), role
-
-### Restaurant
-- id, name, shortDescription, longDescription
-- address, city, latitude, longitude
-- mainImage, timestamps
-
-### Review
-- id, rating (1-5), comment, visitDate
-- userId, restaurantId, timestamps
-- **Unique constraint**: (userId, restaurantId)
-
-## 🎨 UI/UX Features
-
-- Modern, clean interface
-- Smooth animations
-- Pull-to-refresh
-- Loading states
-- Error handling
-- Empty states
-- Responsive design
-
-## 🧪 Testing the App
-
-1. **User Flow**:
-   - Register a new account
-   - Browse restaurants
-   - Add a review
-   - Edit your review
-   - View "My Reviews"
-
-2. **Admin Flow**:
-   - Login as admin
-   - Add a new restaurant
-   - Edit restaurant details
-   - Delete a restaurant
-
-3. **Business Rules**:
-   - Try adding multiple reviews to same restaurant (should fail)
-   - Check that ratings update correctly
-   - Verify only owners can edit/delete reviews
-
-## 🐛 Troubleshooting
-
-### Backend won't start
-- Check if port 3000 is available
-- Verify all dependencies are installed
-- Check .env file exists
-
-### Frontend can't connect
-- Verify backend is running
-- Check API_BASE_URL in config/api.js
-- For Android emulator, use 10.0.2.2
-- For physical device, use your computer's local IP
-
-### Images not uploading
-- Check backend uploads/ directory exists
-- Verify multer middleware is working
-- Grant camera/gallery permissions on device
-
-### Auth not persisting
-- Clear app data and reinstall
-- Check SecureStore functionality
-- Verify tokens are being saved
-
-## 📝 API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user
-
-### Restaurants
-- `GET /api/restaurants` - List restaurants
-- `GET /api/restaurants/:id` - Get restaurant
-- `POST /api/restaurants` - Create (admin)
-- `PUT /api/restaurants/:id` - Update (admin)
-- `DELETE /api/restaurants/:id` - Delete (admin)
-
-### Reviews
-- `GET /api/reviews/me` - Get user's reviews
-- `GET /api/reviews/can-review/:id` - Check if can review
-- `POST /api/reviews` - Create review
-- `PUT /api/reviews/:id` - Update review
-- `DELETE /api/reviews/:id` - Delete review
-
-## 🎓 What You'll Learn
-
-- React Native mobile development
-- Expo ecosystem and tools
-- Navigation with Expo Router
-- State management patterns
-- API integration
-- Authentication flows
-- Image handling
-- Database design
-- Backend API development
-- Full-stack architecture
-
-## 🤝 Contributing
-
-This is an educational project. Feel free to:
-- Fork and experiment
-- Add new features
-- Improve the code
-- Share your learnings
-
-## 📄 License
-
-This project is for educational purposes only.
-
-## 👏 Acknowledgments
-
-Built as a training project to demonstrate modern mobile app development with React Native and Node.js.
-
----
-
-**Happy Coding! 🚀**
+📄 Achban-Lik – Project Requirements Document (Cahier des Charges)
+1️⃣ Project Title
+
+Achban-Lik – Restaurant Review Mobile Application
+
+Type: Educational / Training Project
+
+Platform: Mobile (React Native with Expo)
+
+Backend: Node.js + Express + Sequelize
+
+Database: SQLite (training purpose)
+
+2️⃣ Project Overview
+
+Achban-Lik is a mobile application that allows users to browse restaurants, read reviews, and share their dining experiences. Admins manage restaurant information, while users can submit one review per restaurant.
+
+Educational Purpose:
+
+The project is designed for training and learning.
+
+Emphasis on beginner-friendly code, clean architecture, and understanding full-stack mobile app development.
+
+3️⃣ Objectives
+
+Learn React Native with Expo
+
+Implement navigation using Expo Router
+
+Understand state management (Zustand + React Query)
+
+Implement backend with MVC architecture
+
+Manage database relations with Sequelize ORM
+
+Implement authentication and authorization (JWT tokens)
+
+Perform CRUD operations for restaurants and reviews
+
+Seed demo data for testing
+
+4️⃣ Functional Requirements
+4.1 User Features
+
+Register / login
+
+Browse restaurant listings
+
+View detailed restaurant information
+
+Add review (only one per restaurant)
+
+Edit or delete own review
+
+View all personal reviews in a My Reviews screen
+
+Filter restaurants by city
+
+See aggregated ratings
+
+4.2 Admin Features
+
+Login as admin
+
+Perform all user actions
+
+Add new restaurants
+
+Edit restaurant information
+
+Delete restaurants
+
+Upload restaurant image (only one per restaurant)
+
+5️⃣ Non-Functional Requirements
+
+Simple and beginner-friendly code
+
+Mobile responsive design
+
+Offline mode is not required
+
+Lightweight and easy to deploy
+
+Basic error handling and validation
+
+Educational focus, no production-level optimization required
+
+6️⃣ User Roles & Permissions
+Role	Permissions
+User	Browse restaurants, add/edit/delete own reviews, view My Reviews
+Admin	All user permissions + manage restaurants (add/edit/delete, upload image)
+
+Authentication: JWT tokens + AsyncStorage for session persistence
+
+Authorization: Backend middleware enforces role-based access
+
+7️⃣ Application Screens
+Screen	Description
+Splash Screen	Shows logo, redirects to auth choice
+Auth Choice	Login / Register buttons
+Register Screen	User details: name, email, password, confirm password
+Login Screen	Email and password fields
+Restaurants List Screen	Card list of restaurants (name, image, short desc, rating, number of reviews) + filters
+Restaurant Details Screen	Full info, reviews, add/edit/delete review options
+Add/Edit Review Screen	Form for adding or editing a review
+My Reviews Screen	Lists all reviews by logged-in user, editable/deletable
+Admin Restaurants Screen	Add/edit/delete restaurants, upload images (admin only)
+Add/Edit Restaurant Screen	Form for restaurant details including name, description, city, coordinates, main image
+8️⃣ Business Rules
+
+Each restaurant may have multiple reviews
+
+Each user can add only one review per restaurant
+
+Users can edit or delete their own reviews
+
+Database enforces uniqueness with (user_id, restaurant_id)
+
+9️⃣ Database Models
+9.1 User
+
+id, name, email, password (hashed), role (user/admin)
+
+One-to-many relationship with Review
+
+9.2 Restaurant
+
+id, name, shortDescription, longDescription, address, city, latitude, longitude, mainImage
+
+One-to-many relationship with Review
+
+9.3 Review
+
+id, rating (1–5), comment, visitDate, userId, restaurantId
+
+Unique constraint: (userId, restaurantId)
+
+10️⃣ Navigation Logic
+
+Handled with Expo Router
+
+_layout.jsx defines public and protected routes:
+
+Public: login, register
+
+Protected: restaurants, reviews
+
+Stack navigation for simplicity
+
+Redirects based on authentication state
+
+11️⃣ Data Validation Rules
+
+Email must be valid
+
+Password minimum length 6 characters
+
+Review rating between 1–5
+
+Review comment required
+
+Restaurant name, city, address required
+
+Main image required
+
+12️⃣ API Contract
+Authentication
+
+POST /auth/register – register new user
+
+POST /auth/login – login user
+
+Restaurants
+
+GET /restaurants – list all
+
+GET /restaurants/:id – restaurant details
+
+POST /restaurants – create (admin only)
+
+PUT /restaurants/:id – update (admin only)
+
+DELETE /restaurants/:id – delete (admin only)
+
+Reviews
+
+GET /reviews/me – list user's reviews
+
+POST /reviews – create review
+
+PUT /reviews/:id – update review
+
+DELETE /reviews/:id – delete review
+
+13️⃣ Image Handling Strategy
+
+One main image per restaurant
+
+Uploaded using multipart/form-data
+
+Stored in backend folder: backend/uploads/restaurants/
+
+API returns filename/URL to frontend
+
+14️⃣ Seeds & Demo Data
+
+Admin account pre-created
+
+20 restaurants seeded with all details (name, description, city, coordinates, main image)
+
+Users pre-created for testing reviews
+
+Seeders automate populating database
+
+15️⃣ Deliverables
+
+Mobile app (React Native + Expo)
+
+Backend API (Express + Sequelize)
+
+Database with seeded data
+
+Source code structured for beginner learning
+
+16️⃣ Security Features
+
+Password hashing (bcrypt)
+
+JWT-based authentication
+
+Role-based access control for protected routes
+
+Input validation on backend
+
+17️⃣ Conclusion
+
+Achban-Lik is a beginner-friendly project demonstrating:
+
+Mobile development fundamentals
+
+Backend API integration
+
+Authentication and role-based permissions
+
+Database modeling and constraints
+
+MVC architecture
+
+Full-stack integration in a simple, educational format
+
+✅ Ready for implementation, testing, and presentation in a training environment.
