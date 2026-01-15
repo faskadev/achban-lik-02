@@ -1,0 +1,37 @@
+{
+    "expo": {
+        "name": "Achban-Lik",
+        "slug": "achban-lik",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "newArchEnabled": true,
+        "userInterfaceStyle": "light",
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.achbanlik.app"
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#ffffff"
+            },
+            "package": "com.achbanlik.app"
+        },
+        "web": {
+            "favicon": "./assets/favicon.png"
+        },
+        "scheme": "achbanlik",
+        "plugins": [
+            "expo-router"
+        ]
+    }
+}
