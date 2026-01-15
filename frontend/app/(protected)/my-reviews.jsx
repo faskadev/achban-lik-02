@@ -10,34 +10,17 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { reviewAPI } from '../config/api';
+import { useMyReviews } from '../../services/review/queries';
+import { useDeleteReview } from '../../services/review/mutation';
 
 export default function MyReviewsScreen() {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
-  const { data: reviewsData, isLoading, refetch, isRefreshing } = useQuery({
-    queryKey: ['myReviews'],
-    queryFn: async () => {
-      const response = await reviewAPI.getMyReviews();
-      return response.data;
-    },
-  });
+  const { data: reviewsData, isLoading, refetch, isRefreshing } = useMyReviews();
 
-  const deleteMutation = useMutation({
-    mutationFn: (reviewId) => reviewAPI.delete(reviewId),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['myReviews']);
-      queryClient.invalidateQueries(['restaurants']);
-      Alert.alert('Succès', 'Avis supprimé avec succès');
-    },
-    onError: (error) => {
-      Alert.alert('Erreur', error.response?.data?.error || 'Impossible de supprimer l\'avis');
-    },
-  });
+  const deleteMutation = useDeleteReview();
 
   const handleDeleteReview = (reviewId) => {
     Alert.alert(

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,34 +12,32 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { reviewAPI } from '../config/api';
+import { useCanReview } from '../../services/review/queries';
+import { useUpdateReview } from '../../services/review/mutation';
 
-export default function AddReviewScreen() {
+export default function EditReviewScreen() {
   const router = useRouter();
-  const { restaurantId, restaurantName } = useLocalSearchParams();
-  const queryClient = useQueryClient();
+  const { reviewId, restaurantId, restaurantName } = useLocalSearchParams();
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
-  const [visitDate, setVisitDate] = useState(new Date().toISOString().split('T')[0]);
+  const [visitDate, setVisitDate] = useState('');
 
-  const createMutation = useMutation({
-    mutationFn: (data) => reviewAPI.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['restaurant', restaurantId]);
-      queryClient.invalidateQueries(['canReview', restaurantId]);
-      queryClient.invalidateQueries(['myReviews']);
-      Alert.alert('Succès', 'Avis ajouté avec succès', [
-        { text: 'OK', onPress: () => router.push('/my-reviews') },
-      ]);
-    },
-    onError: (error) => {
-      Alert.alert('Erreur', error.response?.data?.error || 'Impossible d\'ajouter l\'avis');
-    },
-  });
+  // Fetch existing review
+  const { data: canReviewData, isLoading } = useCanReview(restaurantId);
+
+  useEffect(() => {
+    if (canReviewData?.existingReview) {
+      const review = canReviewData.existingReview;
+      setRating(review.rating);
+      setComment(review.comment);
+      setVisitDate(review.visitDate);
+    }
+  }, [canReviewData]);
+
+  const updateMutation = useUpdateReview(reviewId, restaurantId);
 
   const handleSubmit = () => {
     if (rating === 0) {
@@ -51,13 +49,30 @@ export default function AddReviewScreen() {
       return;
     }
 
-    createMutation.mutate({
-      restaurantId: parseInt(restaurantId),
+    updateMutation.mutate({
       rating,
       comment: comment.trim(),
       visitDate,
+      restaurantId: parseInt(restaurantId),
+    }, {
+      onSuccess: () => {
+        Alert.alert('Succès', 'Avis modifié avec succès', [
+          { text: 'OK', onPress: () => router.back() },
+        ]);
+      },
+      onError: (error) => {
+        Alert.alert('Erreur', error.response?.data?.error || 'Impossible de modifier l\'avis');
+      },
     });
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF6B6B" />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -71,7 +86,7 @@ export default function AddReviewScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ajouter un avis</Text>
+        <Text style={styles.headerTitle}>Modifier l'avis</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -137,15 +152,15 @@ export default function AddReviewScreen() {
         </View>
 
         <TouchableOpacity
-          style={[styles.submitButton, createMutation.isPending && styles.submitButtonDisabled]}
+          style={[styles.submitButton, updateMutation.isPending && styles.submitButtonDisabled]}
           onPress={handleSubmit}
-          disabled={createMutation.isPending}
+          disabled={updateMutation.isPending}
           activeOpacity={0.8}
         >
-          {createMutation.isPending ? (
+          {updateMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Publier l'avis</Text>
+            <Text style={styles.submitButtonText}>Enregistrer les modifications</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
@@ -157,6 +172,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',

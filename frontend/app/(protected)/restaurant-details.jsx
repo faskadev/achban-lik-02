@@ -10,45 +10,23 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { restaurantAPI, reviewAPI } from '../config/api';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
+import { useRestaurant } from '../../services/restaurant/queries';
+import { useCanReview } from '../../services/review/queries';
+import { useDeleteReview } from '../../services/review/mutation';
 
 export default function RestaurantDetailsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { user } = useAuthStore();
-  const queryClient = useQueryClient();
 
-  const { data: restaurantData, isLoading } = useQuery({
-    queryKey: ['restaurant', id],
-    queryFn: async () => {
-      const response = await restaurantAPI.getById(id);
-      return response.data.restaurant;
-    },
-  });
+  const { data: restaurantData, isLoading } = useRestaurant(id);
 
-  const { data: canReviewData } = useQuery({
-    queryKey: ['canReview', id],
-    queryFn: async () => {
-      const response = await reviewAPI.canReview(id);
-      return response.data;
-    },
-  });
+  const { data: canReviewData } = useCanReview(id);
 
-  const deleteMutation = useMutation({
-    mutationFn: (reviewId) => reviewAPI.delete(reviewId),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['restaurant', id]);
-      queryClient.invalidateQueries(['canReview', id]);
-      Alert.alert('Succès', 'Avis supprimé avec succès');
-    },
-    onError: (error) => {
-      Alert.alert('Erreur', error.response?.data?.error || 'Impossible de supprimer l\'avis');
-    },
-  });
+  const deleteMutation = useDeleteReview(id);
 
   const handleDeleteReview = (reviewId) => {
     Alert.alert(

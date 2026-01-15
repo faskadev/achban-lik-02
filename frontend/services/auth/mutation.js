@@ -1,0 +1,36 @@
+import { useMutation } from '@tanstack/react-query';
+import api from '../api';
+import { useAuthStore } from '../../store/authStore';
+import { useRouter } from 'expo-router';
+
+export const useLogin = () => {
+    const { setAuth } = useAuthStore();
+    const router = useRouter();
+
+    return useMutation({
+        mutationFn: async (credentials) => {
+            const { data } = await api.post('/auth/login', credentials);
+            return data;
+        },
+        onSuccess: (data) => {
+            setAuth(data.user, data.token);
+            // Router redirection is now handled by the protected layout logic
+        },
+    });
+};
+
+export const useRegister = () => {
+    const { setAuth } = useAuthStore();
+    const router = useRouter();
+
+    return useMutation({
+        mutationFn: async (credentials) => {
+            const { data } = await api.post('/auth/register', credentials);
+            return data;
+        },
+        onSuccess: (data) => {
+            setAuth(data.user, data.token);
+             // Router redirection is now handled by the protected layout logic
+        },
+    });
+};

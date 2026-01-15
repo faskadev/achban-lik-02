@@ -13,43 +13,31 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { authAPI } from '../config/api';
-import { useAuthStore } from '../store/authStore';
+import { authAPI } from '../../config/api';
+import { useAuthStore } from '../../store/authStore';
 
-export default function RegisterScreen() {
+export default function LoginScreen() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleRegister = async () => {
-    if (!name || !email || !password || !confirmPassword) {
+  const handleLogin = async () => {
+    if (!email || !password) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères');
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await authAPI.register({ name, email, password });
+      const response = await authAPI.login({ email, password });
       await setAuth(response.data.user, response.data.token);
       router.replace('/restaurants');
     } catch (error) {
       Alert.alert(
-        'Erreur d\'inscription',
-        error.response?.data?.error || 'Une erreur est survenue'
+        'Erreur de connexion',
+        error.response?.data?.error || 'Email ou mot de passe incorrect'
       );
     } finally {
       setIsLoading(false);
@@ -67,23 +55,12 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <Text style={styles.emoji}>✨</Text>
-          <Text style={styles.title}>Créer un compte</Text>
-          <Text style={styles.subtitle}>Rejoignez notre communauté</Text>
+          <Text style={styles.emoji}>👋</Text>
+          <Text style={styles.title}>Welcome back!</Text>
+          <Text style={styles.subtitle}>Sign in to your account</Text>
         </View>
 
         <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Nom complet</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Votre nom"
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
-            />
-          </View>
-
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email</Text>
             <TextInput
@@ -98,7 +75,7 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Mot de passe</Text>
+            <Text style={styles.label}>Password</Text>
             <TextInput
               style={styles.input}
               placeholder="••••••••"
@@ -109,35 +86,23 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Confirmer le mot de passe</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              autoCapitalize="none"
-            />
-          </View>
-
           <TouchableOpacity
             style={[styles.button, isLoading && styles.buttonDisabled]}
-            onPress={handleRegister}
+            onPress={handleLogin}
             disabled={isLoading}
             activeOpacity={0.8}
           >
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>S'inscrire</Text>
+              <Text style={styles.buttonText}>Sign in</Text>
             )}
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Déjà un compte? </Text>
-            <TouchableOpacity onPress={() => router.push('/login')}>
-              <Text style={styles.link}>Se connecter</Text>
+            <Text style={styles.footerText}>Don't have an account? </Text>
+            <TouchableOpacity onPress={() => router.push('/register')}>
+              <Text style={styles.link}>Create an account</Text>
             </TouchableOpacity>
           </View>
 
@@ -145,7 +110,7 @@ export default function RegisterScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Text style={styles.backButtonText}>← Retour</Text>
+            <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

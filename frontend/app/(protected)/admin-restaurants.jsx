@@ -10,33 +10,17 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { restaurantAPI } from '../config/api';
+import { useRestaurants } from '../../services/restaurant/queries';
+import { useDeleteRestaurant } from '../../services/restaurant/mutation';
 
 export default function AdminRestaurantsScreen() {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
-  const { data: restaurantsData, isLoading, refetch, isRefreshing } = useQuery({
-    queryKey: ['restaurants'],
-    queryFn: async () => {
-      const response = await restaurantAPI.getAll();
-      return response.data;
-    },
-  });
+  const { data: restaurantsData, isLoading, refetch, isRefreshing } = useRestaurants();
 
-  const deleteMutation = useMutation({
-    mutationFn: (id) => restaurantAPI.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['restaurants']);
-      Alert.alert('Succès', 'Restaurant supprimé avec succès');
-    },
-    onError: (error) => {
-      Alert.alert('Erreur', error.response?.data?.error || 'Impossible de supprimer le restaurant');
-    },
-  });
+  const deleteMutation = useDeleteRestaurant();
 
   const handleDeleteRestaurant = (id, name) => {
     Alert.alert(
@@ -44,7 +28,14 @@ export default function AdminRestaurantsScreen() {
       `Êtes-vous sûr de vouloir supprimer "${name}"? Cette action supprimera également tous les avis associés.`,
       [
         { text: 'Annuler', style: 'cancel' },
-        { text: 'Supprimer', style: 'destructive', onPress: () => deleteMutation.mutate(id) },
+        { text: 'Supprimer', style: 'destructive', onPress: () => deleteMutation.mutate(id, {
+          onSuccess: () => {
+            Alert.alert('Succès', 'Restaurant supprimé avec succès');
+          },
+          onError: (error) => {
+            Alert.alert('Erreur', error.response?.data?.error || 'Impossible de supprimer le restaurant');
+          },
+        }) },
       ]
     );
   };

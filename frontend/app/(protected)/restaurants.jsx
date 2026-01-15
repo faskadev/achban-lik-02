@@ -10,33 +10,21 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { restaurantAPI } from '../config/api';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
+import { useRestaurants, useCities } from '../../services/restaurant/queries';
 
 export default function RestaurantsScreen() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [selectedCity, setSelectedCity] = useState(null);
 
-  const { data: restaurantsData, isLoading, refetch, isRefreshing } = useQuery({
-    queryKey: ['restaurants', selectedCity],
-    queryFn: async () => {
-      const params = selectedCity ? { city: selectedCity } : {};
-      const response = await restaurantAPI.getAll(params);
-      return response.data;
-    },
-  });
+  const { data: restaurantsData, isLoading, refetch, isRefreshing } = useRestaurants(
+    selectedCity ? { city: selectedCity } : {}
+  );
 
-  const { data: citiesData } = useQuery({
-    queryKey: ['cities'],
-    queryFn: async () => {
-      const response = await restaurantAPI.getCities();
-      return response.data;
-    },
-  });
+  const { data: citiesData } = useCities();
 
   const handleLogout = async () => {
     await logout();
@@ -57,7 +45,7 @@ export default function RestaurantsScreen() {
           <Image
             source={{ uri: `http://localhost:3000${item.mainImage}` }}
             style={styles.image}
-            defaultSource={require('../assets/placeholder.png')}
+            defaultSource={require('../../assets/placeholder.png')}
           />
           <View style={styles.cityBadge}>
             <Text style={styles.cityBadgeText}>{item.city}</Text>

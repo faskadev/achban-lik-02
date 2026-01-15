@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,17 +10,18 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
+  Image,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { restaurantAPI } from '../config/api';
+import { useRestaurant } from '../../services/restaurant/queries';
+import { useUpdateRestaurant } from '../../services/restaurant/mutation';
 
-export default function AddRestaurantScreen() {
+export default function EditRestaurantScreen() {
   const router = useRouter();
-  const queryClient = useQueryClient();
+  const { id } = useLocalSearchParams();
 
   const [name, setName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
@@ -30,19 +31,25 @@ export default function AddRestaurantScreen() {
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [image, setImage] = useState(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState(null);
 
-  const createMutation = useMutation({
-    mutationFn: (data) => restaurantAPI.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['restaurants']);
-      Alert.alert('Succès', 'Restaurant ajouté avec succès', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
-    },
-    onError: (error) => {
-      Alert.alert('Erreur', error.response?.data?.error || 'Impossible d\'ajouter le restaurant');
-    },
-  });
+  // Fetch restaurant details
+  const { data, isLoading } = useRestaurant(id);
+
+  useEffect(() => {
+    if (data) {
+      setName(data.name);
+      setShortDescription(data.shortDescription);
+      setLongDescription(data.longDescription);
+      setAddress(data.address);
+      setCity(data.city);
+      setLatitude(data.latitude.toString());
+      setLongitude(data.longitude.toString());
+      setCurrentImageUrl(data.mainImage);
+    }
+  }, [data]);
+
+  const updateMutation = useUpdateRestaurant(id);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -63,12 +70,7 @@ export default function AddRestaurantScreen() {
       return;
     }
 
-    if (!image) {
-      Alert.alert('Erreur', 'Veuillez sélectionner une image');
-      return;
-    }
-
-    createMutation.mutate({
+    const updateData = {
       name,
       shortDescription,
       longDescription,
@@ -76,9 +78,31 @@ export default function AddRestaurantScreen() {
       city,
       latitude,
       longitude,
-      mainImage: image,
+    };
+
+    if (image) {
+      updateData.mainImage = image;
+    }
+
+    updateMutation.mutate(updateData, {
+      onSuccess: () => {
+        Alert.alert('Succès', 'Restaurant modifié avec succès', [
+          { text: 'OK', onPress: () => router.back() },
+        ]);
+      },
+      onError: (error) => {
+        Alert.alert('Erreur', error.response?.data?.error || 'Impossible de modifier le restaurant');
+      },
     });
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF6B6B" />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -92,7 +116,7 @@ export default function AddRestaurantScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ajouter un restaurant</Text>
+        <Text style={styles.headerTitle}>Modifier le restaurant</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -178,25 +202,33 @@ export default function AddRestaurantScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Image *</Text>
+          <Text style={styles.label}>Image</Text>
           <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-            <Ionicons name="image-outline" size={40} color="#999" />
+            {image ? (
+              <Image source={{ uri: image.uri }} style={styles.previewImage} />
+            ) : currentImageUrl ? (
+              <Image source={{ uri: `http://localhost:3000${currentImageUrl}` }} style={styles.previewImage} />
+            ) : (
+              <View style={styles.placeholderContainer}>
+                 <Ionicons name="image-outline" size={40} color="#999" />
+              </View>
+            )}
             <Text style={styles.imagePickerText}>
-              {image ? 'Image sélectionnée ✓' : 'Sélectionner une image'}
+              {image ? 'Changer l\'image' : 'Modifier l\'image (optionnel)'}
             </Text>
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity
-          style={[styles.submitButton, createMutation.isPending && styles.submitButtonDisabled]}
+          style={[styles.submitButton, updateMutation.isPending && styles.submitButtonDisabled]}
           onPress={handleSubmit}
-          disabled={createMutation.isPending}
+          disabled={updateMutation.isPending}
           activeOpacity={0.8}
         >
-          {createMutation.isPending ? (
+          {updateMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Ajouter le restaurant</Text>
+            <Text style={styles.submitButtonText}>Enregistrer</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
@@ -208,6 +240,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -265,14 +302,23 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     borderStyle: 'dashed',
     borderRadius: 12,
-    paddingVertical: 40,
+    paddingVertical: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  placeholderContainer: {
+    marginBottom: 8,
+  },
+  previewImage: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'cover',
+    borderRadius: 8,
+    marginBottom: 8,
   },
   imagePickerText: {
     fontSize: 14,
     color: '#666',
-    marginTop: 8,
   },
   submitButton: {
     backgroundColor: '#FF6B6B',
