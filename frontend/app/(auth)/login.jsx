@@ -31,7 +31,7 @@ export default function LoginScreen() {
       { email, password },
       {
         onSuccess: () => {
-          router.reload(); 
+          router.replace("/(protected)/");
         },
         onError: (error) => {
           Alert.alert(

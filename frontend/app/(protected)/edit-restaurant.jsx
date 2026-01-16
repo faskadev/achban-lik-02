@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRestaurant } from '../../services/restaurant/queries';
 import { useUpdateRestaurant } from '../../services/restaurant/mutation';
+import { BASE_URL } from '../../services/api';
 
 export default function EditRestaurantScreen() {
   const router = useRouter();
@@ -110,7 +111,7 @@ export default function EditRestaurantScreen() {
       style={styles.container}
     >
       <StatusBar style="dark" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -207,10 +208,10 @@ export default function EditRestaurantScreen() {
             {image ? (
               <Image source={{ uri: image.uri }} style={styles.previewImage} />
             ) : currentImageUrl ? (
-              <Image source={{ uri: `http://localhost:3000${currentImageUrl}` }} style={styles.previewImage} />
+              <Image source={{ uri: `${BASE_URL}${currentImageUrl}` }} style={styles.previewImage} />
             ) : (
               <View style={styles.placeholderContainer}>
-                 <Ionicons name="image-outline" size={40} color="#999" />
+                <Ionicons name="image-outline" size={40} color="#999" />
               </View>
             )}
             <Text style={styles.imagePickerText}>

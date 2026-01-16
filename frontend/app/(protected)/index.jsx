@@ -14,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/authStore';
 import { useRestaurants, useCities } from '../../services/restaurant/queries';
+import { BASE_URL } from '../../services/api';
 
 export default function RestaurantsScreen() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function RestaurantsScreen() {
       >
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: `http://localhost:3000${item.mainImage}` }}
+            source={{ uri: `${BASE_URL}${item.mainImage}` }}
             style={styles.image}
             defaultSource={require('../../assets/placeholder.png')}
           />
@@ -76,7 +77,7 @@ export default function RestaurantsScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -126,7 +127,7 @@ export default function RestaurantsScreen() {
           <Ionicons name="chatbox-ellipses-outline" size={20} color="#FB8500" />
           <Text style={styles.actionButtonText}>My Reviews</Text>
         </TouchableOpacity>
-        
+
         {user?.role === 'admin' && (
           <TouchableOpacity
             style={[styles.actionButton, styles.adminButton]}

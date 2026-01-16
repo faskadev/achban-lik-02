@@ -14,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useRestaurants } from '../../services/restaurant/queries';
 import { useDeleteRestaurant } from '../../services/restaurant/mutation';
+import { BASE_URL } from '../../services/api';
 
 export default function AdminRestaurantsScreen() {
   const router = useRouter();
@@ -28,14 +29,16 @@ export default function AdminRestaurantsScreen() {
       `Êtes-vous sûr de vouloir supprimer "${name}"? Cette action supprimera également tous les avis associés.`,
       [
         { text: 'Annuler', style: 'cancel' },
-        { text: 'Supprimer', style: 'destructive', onPress: () => deleteMutation.mutate(id, {
-          onSuccess: () => {
-            Alert.alert('Succès', 'Restaurant supprimé avec succès');
-          },
-          onError: (error) => {
-            Alert.alert('Erreur', error.response?.data?.error || 'Impossible de supprimer le restaurant');
-          },
-        }) },
+        {
+          text: 'Supprimer', style: 'destructive', onPress: () => deleteMutation.mutate(id, {
+            onSuccess: () => {
+              Alert.alert('Succès', 'Restaurant supprimé avec succès');
+            },
+            onError: (error) => {
+              Alert.alert('Erreur', error.response?.data?.error || 'Impossible de supprimer le restaurant');
+            },
+          })
+        },
       ]
     );
   };
@@ -48,7 +51,7 @@ export default function AdminRestaurantsScreen() {
           activeOpacity={0.7}
         >
           <Image
-            source={{ uri: `http://localhost:3000${item.mainImage}` }}
+            source={{ uri: `${BASE_URL}${item.mainImage}` }}
             style={styles.image}
           />
           <View style={styles.cardContent}>
@@ -67,15 +70,15 @@ export default function AdminRestaurantsScreen() {
             style={styles.actionButton}
             onPress={() => router.push(`/edit-restaurant?id=${item.id}`)}
           >
-            <Ionicons name="create-outline" size={20} color="#FF6B6B" />
-            <Text style={styles.actionButtonText}>Modifier</Text>
+            <Ionicons name="create-outline" size={20} color="#25c71fff" />
+            <Text style={styles.actionButtonText}>Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => handleDeleteRestaurant(item.id, item.name)}
           >
             <Ionicons name="trash-outline" size={20} color="#ff4444" />
-            <Text style={[styles.actionButtonText, { color: '#ff4444' }]}>Supprimer</Text>
+            <Text style={[styles.actionButtonText, { color: '#ff4444' }]}>Delete</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -85,7 +88,7 @@ export default function AdminRestaurantsScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -106,7 +109,7 @@ export default function AdminRestaurantsScreen() {
       {/* Content */}
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#FB8500" />
         </View>
       ) : (
         <FlatList
@@ -118,7 +121,7 @@ export default function AdminRestaurantsScreen() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={refetch}
-              colors={['#FF6B6B']}
+              colors={['#FB8500']}
             />
           }
           ListEmptyComponent={
@@ -216,7 +219,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 14,
-    color: '#FF6B6B',
+    color: '#25c71fff',
     fontWeight: '500',
   },
   emptyContainer: {

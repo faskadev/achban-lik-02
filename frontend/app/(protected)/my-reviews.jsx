@@ -14,6 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useMyReviews } from "../../services/review/queries";
 import { useDeleteReview } from "../../services/review/mutation";
+import { BASE_URL } from "../../services/api";
 
 export default function MyReviewsScreen() {
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function MyReviewsScreen() {
         <View style={styles.cardHeader}>
           <Image
             source={{
-              uri: `http://localhost:3000${item.restaurant.mainImage}`,
+              uri: `${BASE_URL}${item.restaurant.mainImage}`,
             }}
             style={styles.restaurantImage}
           />

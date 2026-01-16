@@ -16,6 +16,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useRestaurant } from '../../services/restaurant/queries';
 import { useCanReview } from '../../services/review/queries';
 import { useDeleteReview } from '../../services/review/mutation';
+import { BASE_URL } from '../../services/api';
 
 export default function RestaurantDetailsScreen() {
   const router = useRouter();
@@ -86,7 +87,7 @@ export default function RestaurantDetailsScreen() {
           {renderStars(review.rating)}
         </View>
         <Text style={styles.reviewComment}>{review.comment}</Text>
-        
+
         {isOwnReview && (
           <View style={styles.reviewActions}>
             <TouchableOpacity
@@ -134,11 +135,11 @@ export default function RestaurantDetailsScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      
+
       {/* Header with Image */}
       <View style={styles.headerImageContainer}>
         <Image
-          source={{ uri: `http://localhost:3000${restaurantData.mainImage}` }}
+          source={{ uri: `${BASE_URL}${restaurantData.mainImage}` }}
           style={styles.headerImage}
         />
         <TouchableOpacity
@@ -153,7 +154,7 @@ export default function RestaurantDetailsScreen() {
         {/* Restaurant Info */}
         <View style={styles.infoSection}>
           <Text style={styles.restaurantName}>{restaurantData.name}</Text>
-          
+
           <View style={styles.ratingRow}>
             <View style={styles.ratingContainer}>
               {renderStars(Math.round(averageRating))}
@@ -187,7 +188,7 @@ export default function RestaurantDetailsScreen() {
           <Text style={styles.sectionTitle}>
             Avis ({restaurantData.reviews?.length || 0})
           </Text>
-          
+
           {restaurantData.reviews && restaurantData.reviews.length > 0 ? (
             restaurantData.reviews.map(renderReviewItem)
           ) : (
