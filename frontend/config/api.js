@@ -1,46 +1,8 @@
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
 
-// Change this to your computer's IP address if testing on physical device
-// Or use 10.0.2.2 for Android emulator
-const API_BASE_URL = 'http://localhost:5000/api';
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  async (config) => {
-    const token = await SecureStore.getItemAsync('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid - could handle logout here
-      SecureStore.deleteItemAsync('authToken');
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default api;
 
 // API endpoints
+
+import api from "../services/api";
 
 // Auth
 export const authAPI = {

@@ -1,19 +1,7 @@
-import { useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 export default function SplashScreen() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace('/auth-choice');
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -32,7 +20,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     justifyContent: 'center',
     alignItems: 'center',
   },
