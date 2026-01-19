@@ -94,15 +94,15 @@ export default function RestaurantDetailsScreen() {
               style={styles.reviewActionButton}
               onPress={() => handleEditReview(review)}
             >
-              <Ionicons name="create-outline" size={18} color="#FF6B6B" />
-              <Text style={styles.reviewActionText}>Modifier</Text>
+              <Ionicons name="create-outline" size={18} color="#32c40d" />
+              <Text style={styles.reviewActionText}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.reviewActionButton}
               onPress={() => handleDeleteReview(review.id)}
             >
               <Ionicons name="trash-outline" size={18} color="#ff4444" />
-              <Text style={[styles.reviewActionText, { color: '#ff4444' }]}>Supprimer</Text>
+              <Text style={[styles.reviewActionText, { color: '#ff4444' }]}>Delete</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -113,7 +113,7 @@ export default function RestaurantDetailsScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FB8500" />
       </View>
     );
   }
@@ -121,9 +121,9 @@ export default function RestaurantDetailsScreen() {
   if (!restaurantData) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Restaurant non trouvé</Text>
+        <Text style={styles.errorText}>Restaurant not found</Text>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backButtonText}>Retour</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -179,7 +179,7 @@ export default function RestaurantDetailsScreen() {
         {canReviewData?.canReview && (
           <TouchableOpacity style={styles.addReviewButton} onPress={handleAddReview}>
             <Ionicons name="add-circle-outline" size={24} color="#fff" />
-            <Text style={styles.addReviewButtonText}>Ajouter un avis</Text>
+            <Text style={styles.addReviewButtonText}>Add a review</Text>
           </TouchableOpacity>
         )}
 
@@ -194,8 +194,8 @@ export default function RestaurantDetailsScreen() {
           ) : (
             <View style={styles.noReviews}>
               <Ionicons name="chatbox-ellipses-outline" size={48} color="#ccc" />
-              <Text style={styles.noReviewsText}>Aucun avis pour le moment</Text>
-              <Text style={styles.noReviewsSubtext}>Soyez le premier à donner votre avis!</Text>
+              <Text style={styles.noReviewsText}>No reviews yet</Text>
+              <Text style={styles.noReviewsSubtext}>Be the first to leave a review!</Text>
             </View>
           )}
         </View>
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     marginHorizontal: 20,
     marginVertical: 20,
     paddingVertical: 14,
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
   },
   reviewActionText: {
     fontSize: 14,
-    color: '#FF6B6B',
+    color: '#32c40d',
     fontWeight: '500',
   },
   noReviews: {
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   backButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -407,5 +407,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  mapsButton: {
+    backgroundColor: '#FB8500',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  mapsButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });

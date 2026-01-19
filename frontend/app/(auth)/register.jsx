@@ -204,12 +204,12 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   button: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#FF6B6B',
+    shadowColor: '#FB8500',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   },
   link: {
     fontSize: 14,
-    color: '#FF6B6B',
+    color: '#FB8500',
     fontWeight: '600',
   },
   backButton: {

@@ -69,7 +69,7 @@ export default function EditReviewScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FB8500" />
       </View>
     );
   }
@@ -86,7 +86,7 @@ export default function EditReviewScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Modifier l'avis</Text>
+        <Text style={styles.headerTitle}>Edit review</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   restaurantName: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#FB8500',
     marginBottom: 30,
     textAlign: 'center',
   },
@@ -250,12 +250,12 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   submitButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#FF6B6B',
+    shadowColor: '#FB8500',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

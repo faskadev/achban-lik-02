@@ -16,6 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useCreateRestaurant } from '../../services/restaurant/mutation';
+import * as FileSystem from 'expo-file-system';
 
 export default function AddRestaurantScreen() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function AddRestaurantScreen() {
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [image, setImage] = useState(null);
+  console.log('Selected image:', image);
 
   const createMutation = useCreateRestaurant();
 
@@ -60,9 +62,8 @@ export default function AddRestaurantScreen() {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [16, 9],
+      mediaTypes: ['images',],
+  
       quality: 0.8,
     });
 
@@ -70,6 +71,12 @@ export default function AddRestaurantScreen() {
       setImage(result.assets[0]);
     }
   };
+  const getImageBuffer = async (image) => {
+  const base64 = await FileSystem.readAsStringAsync(image.uri, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+  return base64;
+};
 
   const handleSubmit = () => {
     if (!name || !shortDescription || !longDescription || !address || !city || !latitude || !longitude) {
@@ -298,12 +305,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   submitButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#FF6B6B',
+    shadowColor: '#FB8500',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

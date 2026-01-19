@@ -133,7 +133,7 @@ export default function MyReviewsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mes Avis</Text>
+        <Text style={styles.headerTitle}>My Reviews</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -162,16 +162,16 @@ export default function MyReviewsScreen() {
                 size={80}
                 color="#ccc"
               />
-              <Text style={styles.emptyText}>Aucun avis publié</Text>
+              <Text style={styles.emptyText}>No reviews posted</Text>
               <Text style={styles.emptySubtext}>
-                Commencez à partager vos expériences!
+                Start sharing your experiences!
               </Text>
               <TouchableOpacity
                 style={styles.browseButton}
                 onPress={() => router.push("/restaurants")}
               >
                 <Text style={styles.browseButtonText}>
-                  Découvrir les restaurants
+                  Discover restaurants
                 </Text>
               </TouchableOpacity>
             </View>
@@ -343,6 +343,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 5,
+    marginLeft: 20,
+    marginRight: 20,
+    bottom: 13,
   },
 
   bottomButtonText: {
