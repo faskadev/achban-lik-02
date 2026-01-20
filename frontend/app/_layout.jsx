@@ -22,7 +22,7 @@ export default function RootLayout() {
     setIsLoading(true); 
     setTimeout(() => {
       setIsLoading(false); 
-    }, "3000");
+    }, "3090");
   }, []);
 
 

@@ -25,17 +25,17 @@ export default function AdminRestaurantsScreen() {
 
   const handleDeleteRestaurant = (id, name) => {
     Alert.alert(
-      'Confirmer la suppression',
-      `Êtes-vous sûr de vouloir supprimer "${name}"? Cette action supprimera également tous les avis associés.`,
+      'Confirm deletion',
+      `Are you sure you want to delete "${name}"? This action will also delete all associated.`,
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Supprimer', style: 'destructive', onPress: () => deleteMutation.mutate(id, {
+          text: 'Delete', style: 'destructive', onPress: () => deleteMutation.mutate(id, {
             onSuccess: () => {
-              Alert.alert('Succès', 'Restaurant supprimé avec succès');
+              Alert.alert('Success', 'Restaurant deleted successfully');
             },
             onError: (error) => {
-              Alert.alert('Erreur', error.response?.data?.error || 'Impossible de supprimer le restaurant');
+              Alert.alert('Error', error.response?.data?.error || 'Unable to delete the restaurant');
             },
           })
         },
