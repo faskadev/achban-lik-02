@@ -1,0 +1,52 @@
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: achban-lik-db
+    environment:
+      POSTGRES_USER: achban
+      POSTGRES_PASSWORD: achban123
+      POSTGRES_DB: achban_lik
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "54321:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U achban -d achban_lik"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: achban-lik-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - JWT_SECRET=9/HMX8Wnoz8cYpM2fGNucdvZulpMH7+/LikydCBMVOaBNdibx2NQeNEUxI1wOo1VH2qiUvyrTgAiDbjG09Nf0rx8oR8u440aRinsUdLbY3DFVM1j7yBMAHqPEDIHQsbGnCX6Op+4kQqqmrjemHXyBcSeXi7MS0G6BFnc2lzPQhZy2L9AN6z4+Mf9jL6N+LfNKguxttYM77G17f6J7PHVZ+C+xV6QuDBh1bkvPzIDiJUB1nC29vMGp3fUq4CSBV0nkYb0GQBVGVU3dm6F+07avMOdEMisw+15rn1yDA4H7U6viDsSpmqF+sj9/GeAZ7Tm097Es76CNsq+vVIMFFdGCA==
+      - DB_HOST=postgres
+      - DB_NAME=achban_lik
+      - DB_USER=achban
+      - DB_PASSWORD=achban123
+      - DB_PORT=5432
+    volumes:
+      # Persist uploads
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  postgres_data:
