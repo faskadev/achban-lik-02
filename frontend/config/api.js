@@ -14,44 +14,59 @@ export const authAPI = {
 // Restaurants
 export const restaurantAPI = {
   getAll: (params) => api.get('/restaurants', { params }),
+
   getById: (id) => api.get(`/restaurants/${id}`),
+
   getCities: () => api.get('/restaurants/filters/cities'),
+
   create: (data) => {
     const formData = new FormData();
-    Object.keys(data).forEach(key => {
-      if (key === 'mainImage' && data[key]) {
-        formData.append('mainImage', {
-          uri: data[key].uri,
-          type: data[key].type || 'image/jpeg',
-          name: data[key].fileName || 'restaurant.jpg',
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'mainImage' && value?.uri) {
+        // 🔥 BACKEND EXPECTS "image"
+        formData.append('image', {
+          uri: value.uri,
+          type: value.type || 'image/jpeg',
+          name: value.fileName || `restaurant-${Date.now()}.jpg`,
         });
-      } else {
-        formData.append(key, data[key]);
+      } else if (key === 'latitude' || key === 'longitude') {
+        formData.append(key, String(parseFloat(value)));
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
       }
     });
-    return api.post('/restaurants', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+
+    return api.post('/restaurants', formData);
   },
+
   update: (id, data) => {
     const formData = new FormData();
-    Object.keys(data).forEach(key => {
-      if (key === 'mainImage' && data[key]?.uri) {
-        formData.append('mainImage', {
-          uri: data[key].uri,
-          type: data[key].type || 'image/jpeg',
-          name: data[key].fileName || 'restaurant.jpg',
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'mainImage' && value?.uri) {
+        formData.append('image', {
+          uri: value.uri,
+          type: value.type || 'image/jpeg',
+          name: value.fileName || `restaurant-${Date.now()}.jpg`,
         });
-      } else {
-        formData.append(key, data[key]);
+      } else if (key === 'latitude' || key === 'longitude') {
+        formData.append(key, String(parseFloat(value)));
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
       }
     });
+
     return api.put(`/restaurants/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
   },
+
   delete: (id) => api.delete(`/restaurants/${id}`),
 };
+
 
 // Reviews
 export const reviewAPI = {

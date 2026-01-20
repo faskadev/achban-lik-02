@@ -29,6 +29,7 @@ export default function RestaurantsScreen() {
 
   const handleLogout = async () => {
     await logout();
+    router.replace('/login');
   };
 
   const renderRestaurantCard = ({ item }) => {

@@ -10,9 +10,9 @@ export default function SplashScreen() {
           <Text style={styles.logoText}>🍽️</Text>
         </View>
         <Text style={styles.appName}>Achban-Lik</Text>
-        <Text style={styles.tagline}>Découvrez les meilleurs restaurants</Text>
+        <Text style={styles.tagline}>Discover the best restaurants</Text>
       </View>
-      <Text style={styles.footer}>Training Project</Text>
+      {/* <Text style={styles.footer}>Training Project</Text> */}
     </View>
   );
 }

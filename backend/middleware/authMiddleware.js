@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-// Verify JWT token and attach user to request
+
 const authenticate = async (req, res, next) => {
+  console.log(req.body)
   try {
-    // Get token from header
+   
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -13,12 +14,11 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const token = authHeader.substring(7); 
 
-    // Verify token
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Get user from database
     const user = await User.findByPk(decoded.userId);
 
     if (!user) {
@@ -27,7 +27,7 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    // Attach user to request
+    
     req.user = user;
     next();
   } catch (error) {
@@ -47,7 +47,7 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-// Check if user is admin
+
 const isAdmin = (req, res, next) => {
   if (req.user && req.user.role === 'admin') {
     next();

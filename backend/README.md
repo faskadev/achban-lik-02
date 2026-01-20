@@ -74,7 +74,7 @@ npm start
 Create a `.env` file:
 
 ```
-PORT=3000
+PORT=5000
 JWT_SECRET=your-secret-key-change-in-production
 DATABASE_PATH=./database.sqlite
 NODE_ENV=development
@@ -84,12 +84,12 @@ NODE_ENV=development
 
 ```
 backend/
-├── controllers/       # Request handlers
-├── middleware/        # Custom middleware
-├── models/            # Sequelize models
-├── routes/            # API routes
-├── seeders/           # Database seeders
-├── uploads/           # Uploaded images
-├── server.js          # Entry point
+├── controllers/       
+├── middleware/        
+├── models/            
+├── routes/            
+├── seeders/           
+├── uploads/           
+├── server.js          
 └── package.json
 ```

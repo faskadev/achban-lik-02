@@ -16,7 +16,6 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useCreateRestaurant } from '../../services/restaurant/mutation';
-import * as FileSystem from 'expo-file-system';
 
 export default function AddRestaurantScreen() {
   const router = useRouter();
@@ -29,35 +28,11 @@ export default function AddRestaurantScreen() {
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [image, setImage] = useState(null);
-  console.log('Selected image:', image);
 
   const createMutation = useCreateRestaurant();
 
-  // Override onSuccess to navigate back
-  const originalOnSuccess = createMutation.options?.onSuccess;
-  // We can't easily override options of the hook result directly if we didn't pass options. 
-  // Ideally, useCreateRestaurant should accept options or we handle navigation in the component side effect after mutation.
-  // BUT, useMutation returns an object with `mutate` and `isPending` etc. `createMutation` IS that object.
-  // The service definition has `onSuccess` built-in which invalidates queries. 
-  // Creating a wrapper around the mutate function to adding callback is typical.
-  // OR we can pass `onSuccess` to `mutate`. 
-  // Let's check how the service was defined. It uses `useMutation({ mutationFn, onSuccess })`.
-  // React Query allow passing `onSuccess` to `mutate(variable, { onSuccess })`.
-  // So I can keep the service simple and add component specific logic here.
-  
-  // Actually, wait. The original code had:
-  /*
-    onSuccess: () => {
-      queryClient.invalidateQueries(['restaurants']);
-      Alert.alert('Succès', 'Restaurant ajouté avec succès', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
-    },
-  */
-  // The service only invalidates queries. It does NOT show alerts or navigate.
-  // So I should modify how `createMutation.mutate` is called in `handleSubmit`.
-  
-  // So here simply replace the definition.
+
+
 
 
   const pickImage = async () => {
@@ -71,12 +46,7 @@ export default function AddRestaurantScreen() {
       setImage(result.assets[0]);
     }
   };
-  const getImageBuffer = async (image) => {
-  const base64 = await FileSystem.readAsStringAsync(image.uri, {
-    encoding: FileSystem.EncodingType.Base64,
-  });
-  return base64;
-};
+
 
   const handleSubmit = () => {
     if (!name || !shortDescription || !longDescription || !address || !city || !latitude || !longitude) {
@@ -97,7 +67,7 @@ export default function AddRestaurantScreen() {
       city,
       latitude,
       longitude,
-      mainImage: image,
+      image,
     }, {
       onSuccess: () => {
         Alert.alert('Succès', 'Restaurant ajouté avec succès', [
@@ -105,6 +75,7 @@ export default function AddRestaurantScreen() {
         ]);
       },
       onError: (error) => {
+        console.log(error.response.data)
         Alert.alert('Erreur', error.response?.data?.error || 'Impossible d\'ajouter le restaurant');
       },
     });

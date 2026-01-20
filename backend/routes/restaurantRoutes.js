@@ -29,8 +29,8 @@ router.get('/filters/cities', getCities);
 router.get('/:id', getRestaurantById);
 
 // Admin routes
-router.post('/', authenticate, isAdmin, upload.single('mainImage'), restaurantValidation, createRestaurant);
-router.put('/:id', authenticate, isAdmin, upload.single('mainImage'), restaurantValidation, updateRestaurant);
+router.post('/', authenticate, isAdmin, upload.single('image'), restaurantValidation, createRestaurant);
+router.put('/:id', authenticate, isAdmin, upload.single('image'), restaurantValidation, updateRestaurant);
 router.delete('/:id', authenticate, isAdmin, deleteRestaurant);
 
 module.exports = router;

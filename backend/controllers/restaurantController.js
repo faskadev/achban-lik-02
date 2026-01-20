@@ -2,20 +2,18 @@ const { Restaurant, Review, User } = require('../models');
 const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
 
-// @desc    Get all restaurants with filters and ratings
-// @route   GET /api/restaurants
-// @access  Public
+
 const getRestaurants = async (req, res) => {
   try {
     const { city, type } = req.query;
 
-    // Build where clause
+   
     const where = {};
     if (city) {
       where.city = city;
     }
 
-    // Get restaurants with review aggregation
+  
     const restaurants = await Restaurant.findAll({
       where,
       include: [
@@ -47,9 +45,7 @@ const getRestaurants = async (req, res) => {
   }
 };
 
-// @desc    Get single restaurant by ID
-// @route   GET /api/restaurants/:id
-// @access  Public
+
 const getRestaurantById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -77,7 +73,7 @@ const getRestaurantById = async (req, res) => {
       });
     }
 
-    // Calculate average rating
+    
     const reviewCount = restaurant.reviews.length;
     const averageRating = reviewCount > 0
       ? restaurant.reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
@@ -98,11 +94,10 @@ const getRestaurantById = async (req, res) => {
   }
 };
 
-// @desc    Create new restaurant (admin only)
-// @route   POST /api/restaurants
-// @access  Private/Admin
+
 const createRestaurant = async (req, res) => {
   try {
+    console.log('Request body:', req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -115,10 +110,9 @@ const createRestaurant = async (req, res) => {
       address,
       city,
       latitude,
-      longitude
+      longitude,
     } = req.body;
-
-    // Check if image was uploaded
+ 
     if (!req.file) {
       return res.status(400).json({
         error: 'Restaurant image is required'
@@ -150,9 +144,7 @@ const createRestaurant = async (req, res) => {
   }
 };
 
-// @desc    Update restaurant (admin only)
-// @route   PUT /api/restaurants/:id
-// @access  Private/Admin
+
 const updateRestaurant = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -179,7 +171,7 @@ const updateRestaurant = async (req, res) => {
       });
     }
 
-    // Update fields
+   
     const updateData = {
       name,
       shortDescription,
@@ -190,7 +182,7 @@ const updateRestaurant = async (req, res) => {
       longitude: parseFloat(longitude)
     };
 
-    // Update image if new one uploaded
+    
     if (req.file) {
       updateData.mainImage = `/uploads/restaurants/${req.file.filename}`;
     }
@@ -209,9 +201,7 @@ const updateRestaurant = async (req, res) => {
   }
 };
 
-// @desc    Delete restaurant (admin only)
-// @route   DELETE /api/restaurants/:id
-// @access  Private/Admin
+
 const deleteRestaurant = async (req, res) => {
   try {
     const { id } = req.params;
@@ -237,9 +227,7 @@ const deleteRestaurant = async (req, res) => {
   }
 };
 
-// @desc    Get unique cities for filtering
-// @route   GET /api/restaurants/filters/cities
-// @access  Public
+
 const getCities = async (req, res) => {
   try {
     const cities = await Restaurant.findAll({

@@ -2,19 +2,17 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const { validationResult } = require('express-validator');
 
-// Generate JWT token
+
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: '30d'
   });
 };
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
+
 const register = async (req, res) => {
   try {
-    // Validate input
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -22,7 +20,7 @@ const register = async (req, res) => {
 
     const { name, email, password } = req.body;
 
-    // Check if user already exists
+    
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({
@@ -30,7 +28,7 @@ const register = async (req, res) => {
       });
     }
 
-    // Create user
+    
     const user = await User.create({
       name,
       email,
@@ -38,7 +36,7 @@ const register = async (req, res) => {
       role: 'user'
     });
 
-    // Generate token
+   
     const token = generateToken(user.id);
 
     res.status(201).json({
@@ -54,12 +52,10 @@ const register = async (req, res) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+
 const login = async (req, res) => {
   try {
-    // Validate input
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -67,7 +63,7 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user by email
+    
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
@@ -76,7 +72,7 @@ const login = async (req, res) => {
       });
     }
 
-    // Check password
+   
     const isPasswordValid = await user.comparePassword(password);
 
     if (!isPasswordValid) {
@@ -85,7 +81,7 @@ const login = async (req, res) => {
       });
     }
 
-    // Generate token
+   
     const token = generateToken(user.id);
 
     res.status(200).json({
@@ -101,9 +97,7 @@ const login = async (req, res) => {
   }
 };
 
-// @desc    Get current user
-// @route   GET /api/auth/me
-// @access  Private
+
 const getMe = async (req, res) => {
   try {
     res.status(200).json({
