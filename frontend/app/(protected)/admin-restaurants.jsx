@@ -19,7 +19,12 @@ import { BASE_URL } from '../../services/api';
 export default function AdminRestaurantsScreen() {
   const router = useRouter();
 
-  const { data: restaurantsData, isLoading, refetch, isRefreshing } = useRestaurants();
+  const {
+    data: restaurantsData,
+    isLoading,
+    refetch,
+    isRefreshing,
+  } = useRestaurants();
 
   const deleteMutation = useDeleteRestaurant();
 
@@ -30,14 +35,21 @@ export default function AdminRestaurantsScreen() {
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Delete', style: 'destructive', onPress: () => deleteMutation.mutate(id, {
-            onSuccess: () => {
-              Alert.alert('Success', 'Restaurant deleted successfully');
-            },
-            onError: (error) => {
-              Alert.alert('Error', error.response?.data?.error || 'Unable to delete the restaurant');
-            },
-          })
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () =>
+            deleteMutation.mutate(id, {
+              onSuccess: () => {
+                Alert.alert('Success', 'Restaurant deleted successfully');
+              },
+              onError: (error) => {
+                Alert.alert(
+                  'Error',
+                  error.response?.data?.error ||
+                    'Unable to delete the restaurant'
+                );
+              },
+            }),
         },
       ]
     );
@@ -73,12 +85,17 @@ export default function AdminRestaurantsScreen() {
             <Ionicons name="create-outline" size={20} color="#25c71fff" />
             <Text style={styles.actionButtonText}>Edit</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => handleDeleteRestaurant(item.id, item.name)}
           >
             <Ionicons name="trash-outline" size={20} color="#ff4444" />
-            <Text style={[styles.actionButtonText, { color: '#ff4444' }]}>Delete</Text>
+            <Text
+              style={[styles.actionButtonText, { color: '#ff4444' }]}
+            >
+              Delete
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -97,7 +114,9 @@ export default function AdminRestaurantsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Gestion Restaurants</Text>
+
+        <Text style={styles.headerTitle}>Restaurant Management</Text>
+
         <TouchableOpacity
           onPress={() => router.push('/add-restaurant')}
           style={styles.addButton}
@@ -126,8 +145,12 @@ export default function AdminRestaurantsScreen() {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="restaurant-outline" size={80} color="#ccc" />
-              <Text style={styles.emptyText}>Aucun restaurant</Text>
+              <Ionicons
+                name="restaurant-outline"
+                size={80}
+                color="#ccc"
+              />
+              <Text style={styles.emptyText}>No restaurants found</Text>
             </View>
           }
         />
@@ -135,6 +158,7 @@ export default function AdminRestaurantsScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

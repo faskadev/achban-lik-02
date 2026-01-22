@@ -22,35 +22,43 @@ export default function AddReviewScreen() {
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
-  const [visitDate, setVisitDate] = useState(new Date().toISOString().split('T')[0]);
+  const [visitDate, setVisitDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
 
   const createMutation = useCreateReview(restaurantId);
 
   const handleSubmit = () => {
     if (rating === 0) {
-      Alert.alert('Erreur', 'Veuillez sélectionner une note');
+      Alert.alert('Error', 'Please select a rating');
       return;
     }
     if (!comment.trim()) {
-      Alert.alert('Erreur', 'Veuillez ajouter un commentaire');
+      Alert.alert('Error', 'Please add a comment');
       return;
     }
 
-    createMutation.mutate({
-      restaurantId: parseInt(restaurantId),
-      rating,
-      comment: comment.trim(),
-      visitDate,
-    }, {
-      onSuccess: () => {
-        Alert.alert('Succès', 'Avis ajouté avec succès', [
-          { text: 'OK', onPress: () => router.push('/my-reviews') },
-        ]);
+    createMutation.mutate(
+      {
+        restaurantId: parseInt(restaurantId),
+        rating,
+        comment: comment.trim(),
+        visitDate,
       },
-      onError: (error) => {
-        Alert.alert('Erreur', error.response?.data?.error || 'Impossible d\'ajouter l\'avis');
-      },
-    });
+      {
+        onSuccess: () => {
+          Alert.alert('Success', 'Review added successfully', [
+            { text: 'OK', onPress: () => router.push('/my-reviews') },
+          ]);
+        },
+        onError: (error) => {
+          Alert.alert(
+            'Error',
+            error.response?.data?.error || "Unable to add the review"
+          );
+        },
+      }
+    );
   };
 
   return (
@@ -59,13 +67,13 @@ export default function AddReviewScreen() {
       style={styles.container}
     >
       <StatusBar style="dark" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ajouter un avis</Text>
+        <Text style={styles.headerTitle}>Add a review</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -77,7 +85,7 @@ export default function AddReviewScreen() {
 
         {/* Rating */}
         <View style={styles.section}>
-          <Text style={styles.label}>Note *</Text>
+          <Text style={styles.label}>Rating *</Text>
           <View style={styles.starsContainer}>
             {[1, 2, 3, 4, 5].map((star) => (
               <TouchableOpacity
@@ -93,12 +101,13 @@ export default function AddReviewScreen() {
               </TouchableOpacity>
             ))}
           </View>
+
           {rating > 0 && (
             <Text style={styles.ratingText}>
-              {rating === 1 && 'Très mauvais'}
-              {rating === 2 && 'Mauvais'}
-              {rating === 3 && 'Moyen'}
-              {rating === 4 && 'Bon'}
+              {rating === 1 && 'Very bad'}
+              {rating === 2 && 'Bad'}
+              {rating === 3 && 'Average'}
+              {rating === 4 && 'Good'}
               {rating === 5 && 'Excellent'}
             </Text>
           )}
@@ -106,7 +115,7 @@ export default function AddReviewScreen() {
 
         {/* Visit Date */}
         <View style={styles.section}>
-          <Text style={styles.label}>Date de visite *</Text>
+          <Text style={styles.label}>Visit date *</Text>
           <TextInput
             style={styles.input}
             value={visitDate}
@@ -117,21 +126,26 @@ export default function AddReviewScreen() {
 
         {/* Comment */}
         <View style={styles.section}>
-          <Text style={styles.label}>Votre avis *</Text>
+          <Text style={styles.label}>Your review *</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={comment}
             onChangeText={setComment}
-            placeholder="Partagez votre expérience..."
+            placeholder="Share your experience..."
             multiline
             numberOfLines={6}
             textAlignVertical="top"
           />
-          <Text style={styles.charCount}>{comment.length} caractères</Text>
+          <Text style={styles.charCount}>
+            {comment.length} characters
+          </Text>
         </View>
 
         <TouchableOpacity
-          style={[styles.submitButton, createMutation.isPending && styles.submitButtonDisabled]}
+          style={[
+            styles.submitButton,
+            createMutation.isPending && styles.submitButtonDisabled,
+          ]}
           onPress={handleSubmit}
           disabled={createMutation.isPending}
           activeOpacity={0.8}
@@ -139,7 +153,7 @@ export default function AddReviewScreen() {
           {createMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Publier l'avis</Text>
+            <Text style={styles.submitButtonText}>Publish review</Text>
           )}
         </TouchableOpacity>
       </ScrollView>

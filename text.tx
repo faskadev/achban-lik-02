@@ -1,0 +1,78 @@
+achban-lik/
+│
+├── backend/
+│   ├── middleware/
+│   │   ├── authMiddleware.js
+│   │   └── uploadMiddleware.js
+│   │
+│   ├── models/
+│   │   ├── index.js
+│   │   ├── User.js
+│   │   ├── Restaurant.js
+│   │   └── Review.js
+│   │
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   ├── restaurantRoutes.js
+│   │   └── reviewRoutes.js
+│   │
+│   ├── seeders/
+│   │   └── seed.js
+│   │
+│   ├── uploads/
+│   │   └── restaurants/
+│   │
+│   ├── .env
+│   ├── server.js
+│   ├── package.json
+│   └── pnpm-lock.yaml
+│
+├── frontend/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   ├── index.jsx
+│   │   │   ├── login.jsx
+│   │   │   └── register.jsx
+│   │   │
+│   │   └── (protected)/
+│   │       ├── _layout.jsx
+│   │       ├── index.jsx
+│   │       ├── restaurant-details.jsx
+│   │       ├── admin-restaurants.jsx
+│   │       ├── add-restaurant.jsx
+│   │       ├── edit-restaurant.jsx
+│   │       ├── add-review.jsx
+│   │       ├── edit-review.jsx
+│   │       └── my-reviews.jsx
+│   │
+│   ├── components/
+│   │   └── SplashScreen.jsx
+│   │
+│   ├── services/
+│   │   ├── api.js
+│   │   ├── auth/
+│   │   │   ├── queries.js
+│   │   │   └── mutation.js
+│   │   ├── restaurant/
+│   │   │   ├── queries.js
+│   │   │   └── mutation.js
+│   │   └── review/
+│   │       ├── queries.js
+│   │       └── mutation.js
+│   │
+│   ├── store/
+│   │   └── authStore.js
+│   │
+│   ├── assets/
+│   ├── config/
+│   │   └── api.js
+│   │
+│   ├── app.json
+│   ├── babel.config.js
+│   ├── package.json
+│   └── pnpm-lock.yaml
+│
+├── docker-compose.yml   
+├── README.md
+└── .gitignore
+

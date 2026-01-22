@@ -24,49 +24,51 @@ export default function RestaurantDetailsScreen() {
   const { user } = useAuthStore();
 
   const { data: restaurantData, isLoading } = useRestaurant(id);
-
   const { data: canReviewData } = useCanReview(id);
-
   const deleteMutation = useDeleteReview(id);
 
   const handleDeleteReview = (reviewId) => {
     Alert.alert(
-      'Confirmer la suppression',
-      'Êtes-vous sûr de vouloir supprimer cet avis?',
+      'Confirm deletion',
+      'Are you sure you want to delete this review?',
       [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Supprimer', style: 'destructive', onPress: () => deleteMutation.mutate(reviewId) },
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => deleteMutation.mutate(reviewId),
+        },
       ]
     );
   };
 
   const handleAddReview = () => {
-    router.push(`/add-review?restaurantId=${id}&restaurantName=${restaurantData?.name}`);
-  };
-
-  const handleEditReview = (review) => {
-    router.push(`/edit-review?reviewId=${review.id}&restaurantId=${id}&restaurantName=${restaurantData?.name}`);
-  };
-
-  const renderStars = (rating) => {
-    return (
-      <View style={styles.stars}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Ionicons
-            key={star}
-            name={star <= rating ? 'star' : 'star-outline'}
-            size={16}
-            color="#FFD700"
-          />
-        ))}
-      </View>
+    router.push(
+      `/add-review?restaurantId=${id}&restaurantName=${restaurantData?.name}`
     );
   };
 
+  const handleEditReview = (review) => {
+    router.push(
+      `/edit-review?reviewId=${review.id}&restaurantId=${id}&restaurantName=${restaurantData?.name}`
+    );
+  };
+
+  const renderStars = (rating) => (
+    <View style={styles.stars}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Ionicons
+          key={star}
+          name={star <= rating ? 'star' : 'star-outline'}
+          size={16}
+          color="#FFD700"
+        />
+      ))}
+    </View>
+  );
+
   const renderReviewItem = (review) => {
     const isOwnReview = review.userId === user?.id;
-    const userReview = canReviewData?.existingReview;
-    const isUserReview = userReview && review.id === userReview.id;
 
     return (
       <View key={review.id} style={styles.reviewItem}>
@@ -80,12 +82,13 @@ export default function RestaurantDetailsScreen() {
             <View>
               <Text style={styles.reviewUserName}>{review.user.name}</Text>
               <Text style={styles.reviewDate}>
-                {new Date(review.visitDate).toLocaleDateString('fr-FR')}
+                {new Date(review.visitDate).toLocaleDateString('en-US')}
               </Text>
             </View>
           </View>
           {renderStars(review.rating)}
         </View>
+
         <Text style={styles.reviewComment}>{review.comment}</Text>
 
         {isOwnReview && (
@@ -97,12 +100,15 @@ export default function RestaurantDetailsScreen() {
               <Ionicons name="create-outline" size={18} color="#32c40d" />
               <Text style={styles.reviewActionText}>Edit</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.reviewActionButton}
               onPress={() => handleDeleteReview(review.id)}
             >
               <Ionicons name="trash-outline" size={18} color="#ff4444" />
-              <Text style={[styles.reviewActionText, { color: '#ff4444' }]}>Delete</Text>
+              <Text style={[styles.reviewActionText, { color: '#ff4444' }]}>
+                Delete
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -122,7 +128,10 @@ export default function RestaurantDetailsScreen() {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>Restaurant not found</Text>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
       </View>
@@ -163,21 +172,28 @@ export default function RestaurantDetailsScreen() {
               </Text>
             </View>
             <Text style={styles.reviewCount}>
-              ({reviewCount} {reviewCount === 1 ? 'avis' : 'avis'})
+              ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
             </Text>
           </View>
 
           <View style={styles.detailRow}>
             <Ionicons name="location-outline" size={20} color="#666" />
-            <Text style={styles.detailText}>{restaurantData.address}, {restaurantData.city}</Text>
+            <Text style={styles.detailText}>
+              {restaurantData.address}, {restaurantData.city}
+            </Text>
           </View>
 
-          <Text style={styles.description}>{restaurantData.longDescription}</Text>
+          <Text style={styles.description}>
+            {restaurantData.longDescription}
+          </Text>
         </View>
 
         {/* Add Review Button */}
         {canReviewData?.canReview && (
-          <TouchableOpacity style={styles.addReviewButton} onPress={handleAddReview}>
+          <TouchableOpacity
+            style={styles.addReviewButton}
+            onPress={handleAddReview}
+          >
             <Ionicons name="add-circle-outline" size={24} color="#fff" />
             <Text style={styles.addReviewButtonText}>Add a review</Text>
           </TouchableOpacity>
@@ -186,16 +202,22 @@ export default function RestaurantDetailsScreen() {
         {/* Reviews Section */}
         <View style={styles.reviewsSection}>
           <Text style={styles.sectionTitle}>
-            Avis ({restaurantData.reviews?.length || 0})
+            Reviews ({restaurantData.reviews?.length || 0})
           </Text>
 
           {restaurantData.reviews && restaurantData.reviews.length > 0 ? (
             restaurantData.reviews.map(renderReviewItem)
           ) : (
             <View style={styles.noReviews}>
-              <Ionicons name="chatbox-ellipses-outline" size={48} color="#ccc" />
+              <Ionicons
+                name="chatbox-ellipses-outline"
+                size={48}
+                color="#ccc"
+              />
               <Text style={styles.noReviewsText}>No reviews yet</Text>
-              <Text style={styles.noReviewsSubtext}>Be the first to leave a review!</Text>
+              <Text style={styles.noReviewsSubtext}>
+                Be the first to leave a review!
+              </Text>
             </View>
           )}
         </View>
@@ -203,6 +225,7 @@ export default function RestaurantDetailsScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
