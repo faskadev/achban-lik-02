@@ -38,7 +38,7 @@ export default function AddRestaurantScreen() {
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images',],
-  
+
       quality: 0.8,
     });
 
@@ -67,7 +67,7 @@ export default function AddRestaurantScreen() {
       city,
       latitude,
       longitude,
-      image,
+      mainImage: image,
     }, {
       onSuccess: () => {
         Alert.alert('Succès', 'Restaurant ajouté avec succès', [
@@ -87,7 +87,7 @@ export default function AddRestaurantScreen() {
       style={styles.container}
     >
       <StatusBar style="dark" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>

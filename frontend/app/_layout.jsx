@@ -19,9 +19,9 @@ export default function RootLayout() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true); 
+    setIsLoading(true);
     setTimeout(() => {
-      setIsLoading(false); 
+      setIsLoading(false);
     }, "3090");
   }, []);
 

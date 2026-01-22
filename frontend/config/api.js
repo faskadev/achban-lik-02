@@ -37,7 +37,14 @@ export const restaurantAPI = {
       }
     });
 
-    return api.post('/restaurants', formData);
+    return api.post('/restaurants', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      transformRequest: (data, headers) => {
+        return formData; // !!! Force axios to use the FormData
+      },
+    });
   },
 
   update: (id, data) => {

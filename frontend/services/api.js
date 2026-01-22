@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
-
-export const BASE_URL = 'http://192.168.1.127:5000';
+import {Platform} from "react-native"
+export const BASE_URL = Platform.OS === 'ios' ? 'http://localhost:3000' : 'http://192.168.1.127:3000';
 const API_URL = `${BASE_URL}/api`;
 
 const api = axios.create({
