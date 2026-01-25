@@ -10,7 +10,7 @@ Platform: Mobile (React Native with Expo)
 
 Backend: Node.js + Express + Sequelize
 
-Database: SQLite (training purpose)
+Database: SQLite 
 
 2️⃣ Project Overview
 

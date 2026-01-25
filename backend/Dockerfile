@@ -1,4 +1,4 @@
-# Use Node.js Image
+
 FROM node:24-alpine
 
 WORKDIR /app
