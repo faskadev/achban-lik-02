@@ -12,28 +12,21 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { reviewAPI, restaurantAPI } from '../config/api';
+import { useCanReview } from '../../services/review/queries';
+import { useUpdateReview } from '../../services/review/mutation';
 
 export default function EditReviewScreen() {
   const router = useRouter();
   const { reviewId, restaurantId, restaurantName } = useLocalSearchParams();
-  const queryClient = useQueryClient();
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [visitDate, setVisitDate] = useState('');
 
   // Fetch existing review
- const { data: canReviewData, isLoading } = useQuery({
-    queryKey: ['canReview', restaurantId],
-    queryFn: async () => {
-      const response = await reviewAPI.canReview(restaurantId);
-      return response.data;
-    },
-  });
+  const { data: canReviewData, isLoading } = useCanReview(restaurantId);
 
   useEffect(() => {
     if (canReviewData?.existingReview) {
@@ -44,28 +37,15 @@ export default function EditReviewScreen() {
     }
   }, [canReviewData]);
 
-  const updateMutation = useMutation({
-    mutationFn: (data) => reviewAPI.update(reviewId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['restaurant', restaurantId]);
-      queryClient.invalidateQueries(['canReview', restaurantId]);
-      queryClient.invalidateQueries(['myReviews']);
-      Alert.alert('Succès', 'Avis modifié avec succès', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
-    },
-    onError: (error) => {
-      Alert.alert('Erreur', error.response?.data?.error || 'Impossible de modifier l\'avis');
-    },
-  });
+  const updateMutation = useUpdateReview(reviewId, restaurantId);
 
   const handleSubmit = () => {
     if (rating === 0) {
-      Alert.alert('Erreur', 'Veuillez sélectionner une note');
+      Alert.alert('Error', 'Please select a rating');
       return;
     }
     if (!comment.trim()) {
-      Alert.alert('Erreur', 'Veuillez ajouter un commentaire');
+      Alert.alert('Error', 'Please add a comment');
       return;
     }
 
@@ -74,13 +54,22 @@ export default function EditReviewScreen() {
       comment: comment.trim(),
       visitDate,
       restaurantId: parseInt(restaurantId),
+    }, {
+      onSuccess: () => {
+        Alert.alert('Success', 'Review updated successfully', [
+          { text: 'OK', onPress: () => router.back() },
+        ]);
+      },
+      onError: (error) => {
+        Alert.alert('Error', error.response?.data?.error || 'Unable to update the review');
+      },
     });
   };
 
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FB8500" />
       </View>
     );
   }
@@ -97,7 +86,7 @@ export default function EditReviewScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Modifier l'avis</Text>
+        <Text style={styles.headerTitle}>Edit review</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -109,7 +98,7 @@ export default function EditReviewScreen() {
 
         {/* Rating */}
         <View style={styles.section}>
-          <Text style={styles.label}>Note *</Text>
+          <Text style={styles.label}>Rating *</Text>
           <View style={styles.starsContainer}>
             {[1, 2, 3, 4, 5].map((star) => (
               <TouchableOpacity
@@ -127,10 +116,10 @@ export default function EditReviewScreen() {
           </View>
           {rating > 0 && (
             <Text style={styles.ratingText}>
-              {rating === 1 && 'Très mauvais'}
-              {rating === 2 && 'Mauvais'}
-              {rating === 3 && 'Moyen'}
-              {rating === 4 && 'Bon'}
+              {rating === 1 && 'Very bad'}
+              {rating === 2 && 'Bad'}
+              {rating === 3 && 'Average'}
+              {rating === 4 && 'Good'}
               {rating === 5 && 'Excellent'}
             </Text>
           )}
@@ -138,7 +127,7 @@ export default function EditReviewScreen() {
 
         {/* Visit Date */}
         <View style={styles.section}>
-          <Text style={styles.label}>Date de visite *</Text>
+          <Text style={styles.label}>Visit date *</Text>
           <TextInput
             style={styles.input}
             value={visitDate}
@@ -149,17 +138,17 @@ export default function EditReviewScreen() {
 
         {/* Comment */}
         <View style={styles.section}>
-          <Text style={styles.label}>Votre avis *</Text>
+          <Text style={styles.label}>Your review *</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={comment}
             onChangeText={setComment}
-            placeholder="Partagez votre expérience..."
+            placeholder="Share your experience..."
             multiline
             numberOfLines={6}
             textAlignVertical="top"
           />
-          <Text style={styles.charCount}>{comment.length} caractères</Text>
+          <Text style={styles.charCount}>{comment.length} characters</Text>
         </View>
 
         <TouchableOpacity
@@ -171,7 +160,7 @@ export default function EditReviewScreen() {
           {updateMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Enregistrer les modifications</Text>
+            <Text style={styles.submitButtonText}>Save changes</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
@@ -213,7 +202,7 @@ const styles = StyleSheet.create({
   restaurantName: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#FB8500',
     marginBottom: 30,
     textAlign: 'center',
   },
@@ -261,12 +250,12 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   submitButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#FF6B6B',
+    shadowColor: '#FB8500',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

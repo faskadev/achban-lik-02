@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
@@ -10,43 +10,42 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { authAPI } from '../config/api';
-import { useAuthStore } from '../store/authStore';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useLogin } from "../../services/auth/mutation";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { setAuth } = useAuthStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { mutate: loginMutate, isPending: isLoading } = useLogin();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
-
-    setIsLoading(true);
-    try {
-      const response = await authAPI.login({ email, password });
-      await setAuth(response.data.user, response.data.token);
-      router.replace('/restaurants');
-    } catch (error) {
-      Alert.alert(
-        'Erreur de connexion',
-        error.response?.data?.error || 'Email ou mot de passe incorrect'
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    loginMutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          router.replace("/(protected)/");
+        },
+        onError: (error) => {
+          Alert.alert(
+            "Error",
+            error.response?.data?.message || "An error occurred"
+          );
+        },
+      }
+    );
   };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
       <StatusBar style="dark" />
@@ -56,8 +55,8 @@ export default function LoginScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.emoji}>👋</Text>
-          <Text style={styles.title}>Bon retour!</Text>
-          <Text style={styles.subtitle}>Connectez-vous à votre compte</Text>
+          <Text style={styles.title}>Welcome back!</Text>
+          <Text style={styles.subtitle}>Sign in to your account</Text>
         </View>
 
         <View style={styles.form}>
@@ -65,7 +64,7 @@ export default function LoginScreen() {
             <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.input}
-              placeholder="votre@email.com"
+              placeholder="your@email.com"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -75,7 +74,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Mot de passe</Text>
+            <Text style={styles.label}>Password</Text>
             <TextInput
               style={styles.input}
               placeholder="••••••••"
@@ -95,14 +94,14 @@ export default function LoginScreen() {
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Se connecter</Text>
+              <Text style={styles.buttonText}>Sign in</Text>
             )}
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Pas encore de compte? </Text>
-            <TouchableOpacity onPress={() => router.push('/register')}>
-              <Text style={styles.link}>Créer un compte</Text>
+            <Text style={styles.footerText}>Don't have an account? </Text>
+            <TouchableOpacity onPress={() => router.push("/register")}>
+              <Text style={styles.link}>Create an account</Text>
             </TouchableOpacity>
           </View>
 
@@ -110,7 +109,7 @@ export default function LoginScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Text style={styles.backButtonText}>← Retour</Text>
+            <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -121,7 +120,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   scrollContent: {
     flexGrow: 1,
@@ -130,7 +129,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 40,
   },
   emoji: {
@@ -139,13 +138,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#888',
+    color: "#888",
   },
   form: {
     flex: 1,
@@ -155,26 +154,26 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 12,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: "#e0e0e0",
   },
   button: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: "#FB8500",
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
-    shadowColor: '#FF6B6B',
+    shadowColor: "#FB8500",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -184,31 +183,31 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 20,
   },
   footerText: {
     fontSize: 14,
-    color: '#888',
+    color: "#888",
   },
   link: {
     fontSize: 14,
-    color: '#FF6B6B',
-    fontWeight: '600',
+    color: "#FB8500",
+    fontWeight: "600",
   },
   backButton: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   backButtonText: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
 });

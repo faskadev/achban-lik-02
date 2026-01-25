@@ -13,16 +13,16 @@ import {
   Image,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { restaurantAPI } from '../config/api';
+import { useRestaurant } from '../../services/restaurant/queries';
+import { useUpdateRestaurant } from '../../services/restaurant/mutation';
+import { BASE_URL } from '../../services/api';
 
 export default function EditRestaurantScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const queryClient = useQueryClient();
 
   const [name, setName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
@@ -35,13 +35,7 @@ export default function EditRestaurantScreen() {
   const [currentImageUrl, setCurrentImageUrl] = useState(null);
 
   // Fetch restaurant details
-  const { data, isLoading } = useQuery({
-    queryKey: ['restaurant', id],
-    queryFn: async () => {
-      const response = await restaurantAPI.getById(id);
-      return response.data.restaurant;
-    },
-  });
+  const { data, isLoading } = useRestaurant(id);
 
   useEffect(() => {
     if (data) {
@@ -56,19 +50,7 @@ export default function EditRestaurantScreen() {
     }
   }, [data]);
 
-  const updateMutation = useMutation({
-    mutationFn: (updateData) => restaurantAPI.update(id, updateData),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['restaurants']);
-      queryClient.invalidateQueries(['restaurant', id]);
-      Alert.alert('Succès', 'Restaurant modifié avec succès', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
-    },
-    onError: (error) => {
-      Alert.alert('Erreur', error.response?.data?.error || 'Impossible de modifier le restaurant');
-    },
-  });
+  const updateMutation = useUpdateRestaurant(id);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -85,7 +67,7 @@ export default function EditRestaurantScreen() {
 
   const handleSubmit = () => {
     if (!name || !shortDescription || !longDescription || !address || !city || !latitude || !longitude) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
@@ -103,13 +85,22 @@ export default function EditRestaurantScreen() {
       updateData.mainImage = image;
     }
 
-    updateMutation.mutate(updateData);
+    updateMutation.mutate(updateData, {
+      onSuccess: () => {
+        Alert.alert('Success', 'Restaurant updated successfully', [
+          { text: 'OK', onPress: () => router.back() },
+        ]);
+      },
+      onError: (error) => {
+        Alert.alert('Error', error.response?.data?.error || 'Unable to update the restaurant');
+      },
+    });
   };
 
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FB8500" />
       </View>
     );
   }
@@ -120,13 +111,13 @@ export default function EditRestaurantScreen() {
       style={styles.container}
     >
       <StatusBar style="dark" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Modifier le restaurant</Text>
+        <Text style={styles.headerTitle}>Edit restaurant</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -135,32 +126,32 @@ export default function EditRestaurantScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.section}>
-          <Text style={styles.label}>Nom *</Text>
+          <Text style={styles.label}>Name *</Text>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
-            placeholder="Nom du restaurant"
+            placeholder="Restaurant name"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Description courte *</Text>
+          <Text style={styles.label}>Short description *</Text>
           <TextInput
             style={styles.input}
             value={shortDescription}
             onChangeText={setShortDescription}
-            placeholder="Description brève"
+            placeholder="Brief description"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Description longue *</Text>
+          <Text style={styles.label}>Long description *</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={longDescription}
             onChangeText={setLongDescription}
-            placeholder="Description détaillée"
+            placeholder="Detailed description"
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -168,22 +159,22 @@ export default function EditRestaurantScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Adresse *</Text>
+          <Text style={styles.label}>Address *</Text>
           <TextInput
             style={styles.input}
             value={address}
             onChangeText={setAddress}
-            placeholder="Adresse complète"
+            placeholder="Full address"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Ville *</Text>
+          <Text style={styles.label}>City *</Text>
           <TextInput
             style={styles.input}
             value={city}
             onChangeText={setCity}
-            placeholder="Ville"
+            placeholder="City"
           />
         </View>
 
@@ -217,14 +208,14 @@ export default function EditRestaurantScreen() {
             {image ? (
               <Image source={{ uri: image.uri }} style={styles.previewImage} />
             ) : currentImageUrl ? (
-              <Image source={{ uri: `http://localhost:3000${currentImageUrl}` }} style={styles.previewImage} />
+              <Image source={{ uri: `${BASE_URL}${currentImageUrl}` }} style={styles.previewImage} />
             ) : (
               <View style={styles.placeholderContainer}>
-                 <Ionicons name="image-outline" size={40} color="#999" />
+                <Ionicons name="image-outline" size={40} color="#999" />
               </View>
             )}
             <Text style={styles.imagePickerText}>
-              {image ? 'Changer l\'image' : 'Modifier l\'image (optionnel)'}
+              {image ? 'Change image' : 'Edit image (optional)'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -238,7 +229,7 @@ export default function EditRestaurantScreen() {
           {updateMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Enregistrer</Text>
+            <Text style={styles.submitButtonText}>Save</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
@@ -331,12 +322,12 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   submitButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#FF6B6B',
+    shadowColor: '#FB8500',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

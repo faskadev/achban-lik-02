@@ -10,84 +10,65 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { restaurantAPI, reviewAPI } from '../config/api';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
+import { useRestaurant } from '../../services/restaurant/queries';
+import { useCanReview } from '../../services/review/queries';
+import { useDeleteReview } from '../../services/review/mutation';
+import { BASE_URL } from '../../services/api';
 
 export default function RestaurantDetailsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { user } = useAuthStore();
-  const queryClient = useQueryClient();
 
-  const { data: restaurantData, isLoading } = useQuery({
-    queryKey: ['restaurant', id],
-    queryFn: async () => {
-      const response = await restaurantAPI.getById(id);
-      return response.data.restaurant;
-    },
-  });
-
-  const { data: canReviewData } = useQuery({
-    queryKey: ['canReview', id],
-    queryFn: async () => {
-      const response = await reviewAPI.canReview(id);
-      return response.data;
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (reviewId) => reviewAPI.delete(reviewId),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['restaurant', id]);
-      queryClient.invalidateQueries(['canReview', id]);
-      Alert.alert('Succès', 'Avis supprimé avec succès');
-    },
-    onError: (error) => {
-      Alert.alert('Erreur', error.response?.data?.error || 'Impossible de supprimer l\'avis');
-    },
-  });
+  const { data: restaurantData, isLoading } = useRestaurant(id);
+  const { data: canReviewData } = useCanReview(id);
+  const deleteMutation = useDeleteReview(id);
 
   const handleDeleteReview = (reviewId) => {
     Alert.alert(
-      'Confirmer la suppression',
-      'Êtes-vous sûr de vouloir supprimer cet avis?',
+      'Confirm deletion',
+      'Are you sure you want to delete this review?',
       [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Supprimer', style: 'destructive', onPress: () => deleteMutation.mutate(reviewId) },
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => deleteMutation.mutate(reviewId),
+        },
       ]
     );
   };
 
   const handleAddReview = () => {
-    router.push(`/add-review?restaurantId=${id}&restaurantName=${restaurantData?.name}`);
-  };
-
-  const handleEditReview = (review) => {
-    router.push(`/edit-review?reviewId=${review.id}&restaurantId=${id}&restaurantName=${restaurantData?.name}`);
-  };
-
-  const renderStars = (rating) => {
-    return (
-      <View style={styles.stars}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Ionicons
-            key={star}
-            name={star <= rating ? 'star' : 'star-outline'}
-            size={16}
-            color="#FFD700"
-          />
-        ))}
-      </View>
+    router.push(
+      `/add-review?restaurantId=${id}&restaurantName=${restaurantData?.name}`
     );
   };
 
+  const handleEditReview = (review) => {
+    router.push(
+      `/edit-review?reviewId=${review.id}&restaurantId=${id}&restaurantName=${restaurantData?.name}`
+    );
+  };
+
+  const renderStars = (rating) => (
+    <View style={styles.stars}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Ionicons
+          key={star}
+          name={star <= rating ? 'star' : 'star-outline'}
+          size={16}
+          color="#FFD700"
+        />
+      ))}
+    </View>
+  );
+
   const renderReviewItem = (review) => {
     const isOwnReview = review.userId === user?.id;
-    const userReview = canReviewData?.existingReview;
-    const isUserReview = userReview && review.id === userReview.id;
 
     return (
       <View key={review.id} style={styles.reviewItem}>
@@ -101,29 +82,33 @@ export default function RestaurantDetailsScreen() {
             <View>
               <Text style={styles.reviewUserName}>{review.user.name}</Text>
               <Text style={styles.reviewDate}>
-                {new Date(review.visitDate).toLocaleDateString('fr-FR')}
+                {new Date(review.visitDate).toLocaleDateString('en-US')}
               </Text>
             </View>
           </View>
           {renderStars(review.rating)}
         </View>
+
         <Text style={styles.reviewComment}>{review.comment}</Text>
-        
+
         {isOwnReview && (
           <View style={styles.reviewActions}>
             <TouchableOpacity
               style={styles.reviewActionButton}
               onPress={() => handleEditReview(review)}
             >
-              <Ionicons name="create-outline" size={18} color="#FF6B6B" />
-              <Text style={styles.reviewActionText}>Modifier</Text>
+              <Ionicons name="create-outline" size={18} color="#32c40d" />
+              <Text style={styles.reviewActionText}>Edit</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.reviewActionButton}
               onPress={() => handleDeleteReview(review.id)}
             >
               <Ionicons name="trash-outline" size={18} color="#ff4444" />
-              <Text style={[styles.reviewActionText, { color: '#ff4444' }]}>Supprimer</Text>
+              <Text style={[styles.reviewActionText, { color: '#ff4444' }]}>
+                Delete
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -134,7 +119,7 @@ export default function RestaurantDetailsScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#FB8500" />
       </View>
     );
   }
@@ -142,9 +127,12 @@ export default function RestaurantDetailsScreen() {
   if (!restaurantData) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Restaurant non trouvé</Text>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backButtonText}>Retour</Text>
+        <Text style={styles.errorText}>Restaurant not found</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -156,11 +144,11 @@ export default function RestaurantDetailsScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      
+
       {/* Header with Image */}
       <View style={styles.headerImageContainer}>
         <Image
-          source={{ uri: `http://localhost:3000${restaurantData.mainImage}` }}
+          source={{ uri: `${BASE_URL}${restaurantData.mainImage}` }}
           style={styles.headerImage}
         />
         <TouchableOpacity
@@ -175,7 +163,7 @@ export default function RestaurantDetailsScreen() {
         {/* Restaurant Info */}
         <View style={styles.infoSection}>
           <Text style={styles.restaurantName}>{restaurantData.name}</Text>
-          
+
           <View style={styles.ratingRow}>
             <View style={styles.ratingContainer}>
               {renderStars(Math.round(averageRating))}
@@ -184,39 +172,52 @@ export default function RestaurantDetailsScreen() {
               </Text>
             </View>
             <Text style={styles.reviewCount}>
-              ({reviewCount} {reviewCount === 1 ? 'avis' : 'avis'})
+              ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
             </Text>
           </View>
 
           <View style={styles.detailRow}>
             <Ionicons name="location-outline" size={20} color="#666" />
-            <Text style={styles.detailText}>{restaurantData.address}, {restaurantData.city}</Text>
+            <Text style={styles.detailText}>
+              {restaurantData.address}, {restaurantData.city}
+            </Text>
           </View>
 
-          <Text style={styles.description}>{restaurantData.longDescription}</Text>
+          <Text style={styles.description}>
+            {restaurantData.longDescription}
+          </Text>
         </View>
 
         {/* Add Review Button */}
         {canReviewData?.canReview && (
-          <TouchableOpacity style={styles.addReviewButton} onPress={handleAddReview}>
+          <TouchableOpacity
+            style={styles.addReviewButton}
+            onPress={handleAddReview}
+          >
             <Ionicons name="add-circle-outline" size={24} color="#fff" />
-            <Text style={styles.addReviewButtonText}>Ajouter un avis</Text>
+            <Text style={styles.addReviewButtonText}>Add a review</Text>
           </TouchableOpacity>
         )}
 
         {/* Reviews Section */}
         <View style={styles.reviewsSection}>
           <Text style={styles.sectionTitle}>
-            Avis ({restaurantData.reviews?.length || 0})
+            Reviews ({restaurantData.reviews?.length || 0})
           </Text>
-          
+
           {restaurantData.reviews && restaurantData.reviews.length > 0 ? (
             restaurantData.reviews.map(renderReviewItem)
           ) : (
             <View style={styles.noReviews}>
-              <Ionicons name="chatbox-ellipses-outline" size={48} color="#ccc" />
-              <Text style={styles.noReviewsText}>Aucun avis pour le moment</Text>
-              <Text style={styles.noReviewsSubtext}>Soyez le premier à donner votre avis!</Text>
+              <Ionicons
+                name="chatbox-ellipses-outline"
+                size={48}
+                color="#ccc"
+              />
+              <Text style={styles.noReviewsText}>No reviews yet</Text>
+              <Text style={styles.noReviewsSubtext}>
+                Be the first to leave a review!
+              </Text>
             </View>
           )}
         </View>
@@ -224,6 +225,7 @@ export default function RestaurantDetailsScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -321,7 +323,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     marginHorizontal: 20,
     marginVertical: 20,
     paddingVertical: 14,
@@ -363,7 +365,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -401,7 +403,7 @@ const styles = StyleSheet.create({
   },
   reviewActionText: {
     fontSize: 14,
-    color: '#FF6B6B',
+    color: '#32c40d',
     fontWeight: '500',
   },
   noReviews: {
@@ -419,7 +421,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   backButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -428,5 +430,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  mapsButton: {
+    backgroundColor: '#FB8500',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  mapsButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });

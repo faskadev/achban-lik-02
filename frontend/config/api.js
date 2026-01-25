@@ -1,97 +1,78 @@
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
 
-// Change this to your computer's IP address if testing on physical device
-// Or use 10.0.2.2 for Android emulator
-const API_BASE_URL = 'http://192.168.1.114:3000/api';
+import api from "../services/api";
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  async (config) => {
-    const token = await SecureStore.getItemAsync('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid - could handle logout here
-      SecureStore.deleteItemAsync('authToken');
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default api;
-
-// API endpoints
-
-// Auth
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
   getMe: () => api.get('/auth/me'),
 };
 
-// Restaurants
+
 export const restaurantAPI = {
   getAll: (params) => api.get('/restaurants', { params }),
+
   getById: (id) => api.get(`/restaurants/${id}`),
+
   getCities: () => api.get('/restaurants/filters/cities'),
+
   create: (data) => {
     const formData = new FormData();
-    Object.keys(data).forEach(key => {
-      if (key === 'mainImage' && data[key]) {
-        formData.append('mainImage', {
-          uri: data[key].uri,
-          type: data[key].type || 'image/jpeg',
-          name: data[key].fileName || 'restaurant.jpg',
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'mainImage' && value?.uri) {
+        
+        formData.append('image', {
+          uri: value.uri,
+          type: value.type || 'image/jpeg',
+          name: value.fileName || `restaurant-${Date.now()}.jpg`,
         });
-      } else {
-        formData.append(key, data[key]);
+      } else if (key === 'latitude' || key === 'longitude') {
+        formData.append(key, String(parseFloat(value)));
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
       }
     });
+
     return api.post('/restaurants', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      transformRequest: (data, headers) => {
+        return formData; 
+      },
     });
   },
+
   update: (id, data) => {
     const formData = new FormData();
-    Object.keys(data).forEach(key => {
-      if (key === 'mainImage' && data[key]?.uri) {
-        formData.append('mainImage', {
-          uri: data[key].uri,
-          type: data[key].type || 'image/jpeg',
-          name: data[key].fileName || 'restaurant.jpg',
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'mainImage' && value?.uri) {
+        formData.append('image', {
+          uri: value.uri,
+          type: value.type || 'image/jpeg',
+          name: value.fileName || `restaurant-${Date.now()}.jpg`,
         });
-      } else {
-        formData.append(key, data[key]);
+      } else if (key === 'latitude' || key === 'longitude') {
+        formData.append(key, String(parseFloat(value)));
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
       }
     });
+
     return api.put(`/restaurants/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
   },
+
   delete: (id) => api.delete(`/restaurants/${id}`),
 };
 
-// Reviews
+
+
 export const reviewAPI = {
   getMyReviews: () => api.get('/reviews/me'),
   canReview: (restaurantId) => api.get(`/reviews/can-review/${restaurantId}`),

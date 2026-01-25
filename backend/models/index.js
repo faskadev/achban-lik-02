@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-// Initialize Sequelize with SQLite
+
 const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
@@ -16,13 +16,12 @@ const sequelize = new Sequelize(
   }
 );
 
-// Import models
+
 const User = require('./User')(sequelize);
 const Restaurant = require('./Restaurant')(sequelize);
 const Review = require('./Review')(sequelize);
 
-// Define associations
-// User has many Reviews
+
 User.hasMany(Review, {
   foreignKey: 'userId',
   as: 'reviews',
@@ -34,7 +33,7 @@ Review.belongsTo(User, {
   as: 'user'
 });
 
-// Restaurant has many Reviews
+
 Restaurant.hasMany(Review, {
   foreignKey: 'restaurantId',
   as: 'reviews',

@@ -12,15 +12,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { restaurantAPI } from '../config/api';
+import { useCreateRestaurant } from '../../services/restaurant/mutation';
 
 export default function AddRestaurantScreen() {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const [name, setName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
@@ -31,24 +29,12 @@ export default function AddRestaurantScreen() {
   const [longitude, setLongitude] = useState('');
   const [image, setImage] = useState(null);
 
-  const createMutation = useMutation({
-    mutationFn: (data) => restaurantAPI.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['restaurants']);
-      Alert.alert('Succès', 'Restaurant ajouté avec succès', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
-    },
-    onError: (error) => {
-      Alert.alert('Erreur', error.response?.data?.error || 'Impossible d\'ajouter le restaurant');
-    },
-  });
+  const createMutation = useCreateRestaurant();
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [16, 9],
+      mediaTypes: ['images'],
+
       quality: 0.8,
     });
 
@@ -59,12 +45,12 @@ export default function AddRestaurantScreen() {
 
   const handleSubmit = () => {
     if (!name || !shortDescription || !longDescription || !address || !city || !latitude || !longitude) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     if (!image) {
-      Alert.alert('Erreur', 'Veuillez sélectionner une image');
+      Alert.alert('Error', 'Please select an image');
       return;
     }
 
@@ -77,6 +63,16 @@ export default function AddRestaurantScreen() {
       latitude,
       longitude,
       mainImage: image,
+    }, {
+      onSuccess: () => {
+        Alert.alert('Success', 'Restaurant added successfully', [
+          { text: 'OK', onPress: () => router.back() },
+        ]);
+      },
+      onError: (error) => {
+        console.log(error.response.data)
+        Alert.alert('Error', error.response?.data?.error || 'Unable to add the restaurant');
+      },
     });
   };
 
@@ -86,13 +82,13 @@ export default function AddRestaurantScreen() {
       style={styles.container}
     >
       <StatusBar style="dark" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ajouter un restaurant</Text>
+        <Text style={styles.headerTitle}>Add a restaurant</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -101,32 +97,32 @@ export default function AddRestaurantScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.section}>
-          <Text style={styles.label}>Nom *</Text>
+          <Text style={styles.label}>Name *</Text>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
-            placeholder="Nom du restaurant"
+            placeholder="Restaurant name"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Description courte *</Text>
+          <Text style={styles.label}>Short description *</Text>
           <TextInput
             style={styles.input}
             value={shortDescription}
             onChangeText={setShortDescription}
-            placeholder="Description brève"
+            placeholder="Brief description"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Description longue *</Text>
+          <Text style={styles.label}>Long description *</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={longDescription}
             onChangeText={setLongDescription}
-            placeholder="Description détaillée"
+            placeholder="Detailed description"
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -134,22 +130,22 @@ export default function AddRestaurantScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Adresse *</Text>
+          <Text style={styles.label}>Address *</Text>
           <TextInput
             style={styles.input}
             value={address}
             onChangeText={setAddress}
-            placeholder="Adresse complète"
+            placeholder="Full address"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Ville *</Text>
+          <Text style={styles.label}>City *</Text>
           <TextInput
             style={styles.input}
             value={city}
             onChangeText={setCity}
-            placeholder="Ville"
+            placeholder="City"
           />
         </View>
 
@@ -182,7 +178,7 @@ export default function AddRestaurantScreen() {
           <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
             <Ionicons name="image-outline" size={40} color="#999" />
             <Text style={styles.imagePickerText}>
-              {image ? 'Image sélectionnée ✓' : 'Sélectionner une image'}
+              {image ? 'Image selected ✓' : 'Select an image'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -196,7 +192,7 @@ export default function AddRestaurantScreen() {
           {createMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Ajouter le restaurant</Text>
+            <Text style={styles.submitButtonText}>Add restaurant</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
@@ -275,12 +271,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   submitButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#FF6B6B',
+    shadowColor: '#FB8500',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

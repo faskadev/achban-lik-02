@@ -1,9 +1,7 @@
 const { Review, Restaurant, User } = require('../models');
 const { validationResult } = require('express-validator');
 
-// @desc    Get all reviews for current user
-// @route   GET /api/reviews/me
-// @access  Private
+
 const getMyReviews = async (req, res) => {
   try {
     const reviews = await Review.findAll({
@@ -30,9 +28,7 @@ const getMyReviews = async (req, res) => {
   }
 };
 
-// @desc    Create a new review
-// @route   POST /api/reviews
-// @access  Private
+
 const createReview = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -42,7 +38,7 @@ const createReview = async (req, res) => {
 
     const { restaurantId, rating, comment, visitDate } = req.body;
 
-    // Check if restaurant exists
+ 
     const restaurant = await Restaurant.findByPk(restaurantId);
     if (!restaurant) {
       return res.status(404).json({
@@ -50,7 +46,7 @@ const createReview = async (req, res) => {
       });
     }
 
-    // Check if user already reviewed this restaurant
+
     const existingReview = await Review.findOne({
       where: {
         userId: req.user.id,
@@ -64,7 +60,7 @@ const createReview = async (req, res) => {
       });
     }
 
-    // Create review
+
     const review = await Review.create({
       userId: req.user.id,
       restaurantId,
@@ -73,7 +69,7 @@ const createReview = async (req, res) => {
       visitDate
     });
 
-    // Fetch the created review with associations
+
     const createdReview = await Review.findByPk(review.id, {
       include: [
         {
@@ -101,9 +97,7 @@ const createReview = async (req, res) => {
   }
 };
 
-// @desc    Update a review
-// @route   PUT /api/reviews/:id
-// @access  Private
+
 const updateReview = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -122,21 +116,20 @@ const updateReview = async (req, res) => {
       });
     }
 
-    // Check if user owns the review
+  
     if (review.userId !== req.user.id) {
       return res.status(403).json({
         error: 'You can only edit your own reviews'
       });
     }
 
-    // Update review
+
     await review.update({
       rating: parseInt(rating),
       comment,
       visitDate
     });
 
-    // Fetch updated review with associations
     const updatedReview = await Review.findByPk(id, {
       include: [
         {
@@ -164,9 +157,7 @@ const updateReview = async (req, res) => {
   }
 };
 
-// @desc    Delete a review
-// @route   DELETE /api/reviews/:id
-// @access  Private
+
 const deleteReview = async (req, res) => {
   try {
     const { id } = req.params;
@@ -179,7 +170,6 @@ const deleteReview = async (req, res) => {
       });
     }
 
-    // Check if user owns the review
     if (review.userId !== req.user.id) {
       return res.status(403).json({
         error: 'You can only delete your own reviews'
@@ -199,9 +189,7 @@ const deleteReview = async (req, res) => {
   }
 };
 
-// @desc    Check if user can review a restaurant
-// @route   GET /api/reviews/can-review/:restaurantId
-// @access  Private
+
 const canReviewRestaurant = async (req, res) => {
   try {
     const { restaurantId } = req.params;

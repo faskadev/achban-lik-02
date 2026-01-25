@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButton: {
-    backgroundColor: '#FF6B6B',
-    shadowColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
+    shadowColor: '#FB8500',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -99,10 +99,10 @@ const styles = StyleSheet.create({
   secondaryButton: {
     backgroundColor: '#fff',
     borderWidth: 2,
-    borderColor: '#FF6B6B',
+    borderColor: '#FB8500',
   },
   secondaryButtonText: {
-    color: '#FF6B6B',
+    color: '#FB8500',
     fontSize: 18,
     fontWeight: 'bold',
   },

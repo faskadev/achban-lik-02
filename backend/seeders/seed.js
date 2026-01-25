@@ -5,11 +5,11 @@ const seedData = async () => {
   try {
     console.log('🌱 Starting database seeding...');
 
-    // Sync database (force: true will drop existing tables)
+    
     await sequelize.sync({ force: true });
     console.log('✅ Database synced');
 
-    // Create admin user
+   
     const admin = await User.create({
       name: 'Admin User',
       email: 'admin@achbanlik.com',
@@ -18,7 +18,7 @@ const seedData = async () => {
     });
     console.log('✅ Admin user created');
 
-    // Create regular users
+   
     const user1 = await User.create({
       name: 'Ahmed Bennani',
       email: 'ahmed@example.com',
@@ -42,7 +42,7 @@ const seedData = async () => {
 
     console.log('✅ Regular users created');
 
-    // Create 20 restaurants
+ 
     const restaurants = [
       {
         name: 'Le Comptoir Darna',
@@ -249,7 +249,7 @@ const seedData = async () => {
     const createdRestaurants = await Restaurant.bulkCreate(restaurants);
     console.log('✅ 20 restaurants created');
 
-    // Create some sample reviews
+   
     const reviews = [
       {
         userId: user1.id,

@@ -10,42 +10,31 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { restaurantAPI } from '../config/api';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
+import { useRestaurants, useCities } from '../../services/restaurant/queries';
+import { BASE_URL } from '../../services/api';
 
 export default function RestaurantsScreen() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [selectedCity, setSelectedCity] = useState(null);
 
-  const { data: restaurantsData, isLoading, refetch, isRefreshing } = useQuery({
-    queryKey: ['restaurants', selectedCity],
-    queryFn: async () => {
-      const params = selectedCity ? { city: selectedCity } : {};
-      const response = await restaurantAPI.getAll(params);
-      return response.data;
-    },
-  });
+  const { data: restaurantsData, isLoading, refetch, isRefreshing } = useRestaurants(
+    selectedCity ? { city: selectedCity } : {}
+  );
 
-  const { data: citiesData } = useQuery({
-    queryKey: ['cities'],
-    queryFn: async () => {
-      const response = await restaurantAPI.getCities();
-      return response.data;
-    },
-  });
+  const { data: citiesData } = useCities();
 
   const handleLogout = async () => {
     await logout();
-    router.replace('/auth-choice');
+    router.replace('/login');
   };
 
   const renderRestaurantCard = ({ item }) => {
-    const averageRating = item.averageRating || 0;
-    const reviewCount = item.reviewCount || 0;
+    const averageRating = Number(item.averageRating) || 0;
+    const reviewCount = Number(item.reviewCount) || 0;
 
     return (
       <TouchableOpacity
@@ -55,9 +44,9 @@ export default function RestaurantsScreen() {
       >
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: `http://localhost:3000${item.mainImage}` }}
+            source={{ uri: `${BASE_URL}${item.mainImage}` }}
             style={styles.image}
-            defaultSource={require('../assets/placeholder.png')}
+            defaultSource={require('../../assets/placeholder.png')}
           />
           <View style={styles.cityBadge}>
             <Text style={styles.cityBadgeText}>{item.city}</Text>
@@ -78,7 +67,7 @@ export default function RestaurantsScreen() {
               </Text>
             </View>
             <Text style={styles.reviewCount}>
-              {reviewCount} {reviewCount === 1 ? 'avis' : 'avis'}
+              {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
             </Text>
           </View>
         </View>
@@ -89,11 +78,11 @@ export default function RestaurantsScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Bonjour,</Text>
+          <Text style={styles.greeting}>Hello,</Text>
           <Text style={styles.userName}>{user?.name || 'Utilisateur'}</Text>
         </View>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
@@ -136,17 +125,17 @@ export default function RestaurantsScreen() {
           style={styles.actionButton}
           onPress={() => router.push('/my-reviews')}
         >
-          <Ionicons name="chatbox-ellipses-outline" size={20} color="#FF6B6B" />
-          <Text style={styles.actionButtonText}>Mes Avis</Text>
+          <Ionicons name="chatbox-ellipses-outline" size={20} color="#FB8500" />
+          <Text style={styles.actionButtonText}>My Reviews</Text>
         </TouchableOpacity>
-        
+
         {user?.role === 'admin' && (
           <TouchableOpacity
             style={[styles.actionButton, styles.adminButton]}
             onPress={() => router.push('/admin-restaurants')}
           >
             <Ionicons name="settings-outline" size={20} color="#fff" />
-            <Text style={styles.adminButtonText}>Gestion Admin</Text>
+            <Text style={styles.adminButtonText}>Admin Management</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -154,7 +143,7 @@ export default function RestaurantsScreen() {
       {/* Restaurant List */}
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#FB8500" />
         </View>
       ) : (
         <FlatList
@@ -166,12 +155,12 @@ export default function RestaurantsScreen() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={refetch}
-              colors={['#FF6B6B']}
+              colors={['#FB8500']}
             />
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Aucun restaurant trouvé</Text>
+              <Text style={styles.emptyText}>No restaurant found</Text>
             </View>
           }
         />
@@ -186,16 +175,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
     paddingTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 12,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   greeting: {
-    fontSize: 14,
+    fontSize: 20,
     color: 'rgba(255, 255, 255, 0.9)',
   },
   userName: {
@@ -223,11 +212,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   filterChipActive: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
   },
   filterChipText: {
     fontSize: 14,
-    color: '#666',
+    color: '#FB8500',
     fontWeight: '500',
   },
   filterChipTextActive: {
@@ -248,17 +237,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#FF6B6B',
+    borderColor: '#FB8500',
     gap: 8,
   },
   actionButtonText: {
-    color: '#FF6B6B',
+    color: '#FB8500',
     fontWeight: '600',
     fontSize: 14,
   },
   adminButton: {
-    backgroundColor: '#FF6B6B',
-    borderColor: '#FF6B6B',
+    backgroundColor: '#FB8500',
+    borderColor: '#FB8500',
   },
   adminButtonText: {
     color: '#fff',
@@ -291,7 +280,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     right: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: '#FB8500',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -305,9 +294,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   restaurantName: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000000ff',
     marginBottom: 8,
   },
   description: {
