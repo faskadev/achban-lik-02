@@ -41,11 +41,11 @@ export default function EditReviewScreen() {
 
   const handleSubmit = () => {
     if (rating === 0) {
-      Alert.alert('Erreur', 'Veuillez sélectionner une note');
+      Alert.alert('Error', 'Please select a rating');
       return;
     }
     if (!comment.trim()) {
-      Alert.alert('Erreur', 'Veuillez ajouter un commentaire');
+      Alert.alert('Error', 'Please add a comment');
       return;
     }
 
@@ -56,12 +56,12 @@ export default function EditReviewScreen() {
       restaurantId: parseInt(restaurantId),
     }, {
       onSuccess: () => {
-        Alert.alert('Succès', 'Avis modifié avec succès', [
+        Alert.alert('Success', 'Review updated successfully', [
           { text: 'OK', onPress: () => router.back() },
         ]);
       },
       onError: (error) => {
-        Alert.alert('Erreur', error.response?.data?.error || 'Impossible de modifier l\'avis');
+        Alert.alert('Error', error.response?.data?.error || 'Unable to update the review');
       },
     });
   };
@@ -98,7 +98,7 @@ export default function EditReviewScreen() {
 
         {/* Rating */}
         <View style={styles.section}>
-          <Text style={styles.label}>Note *</Text>
+          <Text style={styles.label}>Rating *</Text>
           <View style={styles.starsContainer}>
             {[1, 2, 3, 4, 5].map((star) => (
               <TouchableOpacity
@@ -116,10 +116,10 @@ export default function EditReviewScreen() {
           </View>
           {rating > 0 && (
             <Text style={styles.ratingText}>
-              {rating === 1 && 'Très mauvais'}
-              {rating === 2 && 'Mauvais'}
-              {rating === 3 && 'Moyen'}
-              {rating === 4 && 'Bon'}
+              {rating === 1 && 'Very bad'}
+              {rating === 2 && 'Bad'}
+              {rating === 3 && 'Average'}
+              {rating === 4 && 'Good'}
               {rating === 5 && 'Excellent'}
             </Text>
           )}
@@ -127,7 +127,7 @@ export default function EditReviewScreen() {
 
         {/* Visit Date */}
         <View style={styles.section}>
-          <Text style={styles.label}>Date de visite *</Text>
+          <Text style={styles.label}>Visit date *</Text>
           <TextInput
             style={styles.input}
             value={visitDate}
@@ -138,17 +138,17 @@ export default function EditReviewScreen() {
 
         {/* Comment */}
         <View style={styles.section}>
-          <Text style={styles.label}>Votre avis *</Text>
+          <Text style={styles.label}>Your review *</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={comment}
             onChangeText={setComment}
-            placeholder="Partagez votre expérience..."
+            placeholder="Share your experience..."
             multiline
             numberOfLines={6}
             textAlignVertical="top"
           />
-          <Text style={styles.charCount}>{comment.length} caractères</Text>
+          <Text style={styles.charCount}>{comment.length} characters</Text>
         </View>
 
         <TouchableOpacity
@@ -160,7 +160,7 @@ export default function EditReviewScreen() {
           {updateMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Enregistrer les modifications</Text>
+            <Text style={styles.submitButtonText}>Save changes</Text>
           )}
         </TouchableOpacity>
       </ScrollView>

@@ -1,17 +1,14 @@
 
-
-// API endpoints
-
 import api from "../services/api";
 
-// Auth
+
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
   getMe: () => api.get('/auth/me'),
 };
 
-// Restaurants
+
 export const restaurantAPI = {
   getAll: (params) => api.get('/restaurants', { params }),
 
@@ -24,7 +21,7 @@ export const restaurantAPI = {
 
     Object.entries(data).forEach(([key, value]) => {
       if (key === 'mainImage' && value?.uri) {
-        // 🔥 BACKEND EXPECTS "image"
+        
         formData.append('image', {
           uri: value.uri,
           type: value.type || 'image/jpeg',
@@ -42,7 +39,7 @@ export const restaurantAPI = {
         'Content-Type': 'multipart/form-data',
       },
       transformRequest: (data, headers) => {
-        return formData; // !!! Force axios to use the FormData
+        return formData; 
       },
     });
   },
@@ -75,7 +72,7 @@ export const restaurantAPI = {
 };
 
 
-// Reviews
+
 export const reviewAPI = {
   getMyReviews: () => api.get('/reviews/me'),
   canReview: (restaurantId) => api.get(`/reviews/can-review/${restaurantId}`),

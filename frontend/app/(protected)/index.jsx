@@ -67,7 +67,7 @@ export default function RestaurantsScreen() {
               </Text>
             </View>
             <Text style={styles.reviewCount}>
-              {reviewCount} {reviewCount === 1 ? 'avis' : 'avis'}
+              {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
             </Text>
           </View>
         </View>

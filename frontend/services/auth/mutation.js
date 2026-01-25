@@ -26,7 +26,7 @@ export const useRegister = () => {
         },
         onSuccess: (data) => {
             setAuth(data.user, data.token);
-             // Router redirection is now handled by the protected layout logic
+             
         },
     });
 };

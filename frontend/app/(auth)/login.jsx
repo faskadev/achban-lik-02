@@ -24,7 +24,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Erreur", "Veuillez remplir tous les champs");
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
     loginMutate(
@@ -35,8 +35,8 @@ export default function LoginScreen() {
         },
         onError: (error) => {
           Alert.alert(
-            "Erreur",
-            error.response?.data?.message || "Une erreur est survenue"
+            "Error",
+            error.response?.data?.message || "An error occurred"
           );
         },
       }
@@ -64,7 +64,7 @@ export default function LoginScreen() {
             <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.input}
-              placeholder="votre@email.com"
+              placeholder="your@email.com"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"

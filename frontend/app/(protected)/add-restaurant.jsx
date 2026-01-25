@@ -31,13 +31,9 @@ export default function AddRestaurantScreen() {
 
   const createMutation = useCreateRestaurant();
 
-
-
-
-
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images',],
+      mediaTypes: ['images'],
 
       quality: 0.8,
     });
@@ -47,15 +43,14 @@ export default function AddRestaurantScreen() {
     }
   };
 
-
   const handleSubmit = () => {
     if (!name || !shortDescription || !longDescription || !address || !city || !latitude || !longitude) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     if (!image) {
-      Alert.alert('Erreur', 'Veuillez sélectionner une image');
+      Alert.alert('Error', 'Please select an image');
       return;
     }
 
@@ -70,13 +65,13 @@ export default function AddRestaurantScreen() {
       mainImage: image,
     }, {
       onSuccess: () => {
-        Alert.alert('Succès', 'Restaurant ajouté avec succès', [
+        Alert.alert('Success', 'Restaurant added successfully', [
           { text: 'OK', onPress: () => router.back() },
         ]);
       },
       onError: (error) => {
         console.log(error.response.data)
-        Alert.alert('Erreur', error.response?.data?.error || 'Impossible d\'ajouter le restaurant');
+        Alert.alert('Error', error.response?.data?.error || 'Unable to add the restaurant');
       },
     });
   };
@@ -93,7 +88,7 @@ export default function AddRestaurantScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ajouter un restaurant</Text>
+        <Text style={styles.headerTitle}>Add a restaurant</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -102,32 +97,32 @@ export default function AddRestaurantScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.section}>
-          <Text style={styles.label}>Nom *</Text>
+          <Text style={styles.label}>Name *</Text>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
-            placeholder="Nom du restaurant"
+            placeholder="Restaurant name"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Description courte *</Text>
+          <Text style={styles.label}>Short description *</Text>
           <TextInput
             style={styles.input}
             value={shortDescription}
             onChangeText={setShortDescription}
-            placeholder="Description brève"
+            placeholder="Brief description"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Description longue *</Text>
+          <Text style={styles.label}>Long description *</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={longDescription}
             onChangeText={setLongDescription}
-            placeholder="Description détaillée"
+            placeholder="Detailed description"
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -135,22 +130,22 @@ export default function AddRestaurantScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Adresse *</Text>
+          <Text style={styles.label}>Address *</Text>
           <TextInput
             style={styles.input}
             value={address}
             onChangeText={setAddress}
-            placeholder="Adresse complète"
+            placeholder="Full address"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Ville *</Text>
+          <Text style={styles.label}>City *</Text>
           <TextInput
             style={styles.input}
             value={city}
             onChangeText={setCity}
-            placeholder="Ville"
+            placeholder="City"
           />
         </View>
 
@@ -183,7 +178,7 @@ export default function AddRestaurantScreen() {
           <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
             <Ionicons name="image-outline" size={40} color="#999" />
             <Text style={styles.imagePickerText}>
-              {image ? 'Image sélectionnée ✓' : 'Sélectionner une image'}
+              {image ? 'Image selected ✓' : 'Select an image'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -197,7 +192,7 @@ export default function AddRestaurantScreen() {
           {createMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Ajouter le restaurant</Text>
+            <Text style={styles.submitButtonText}>Add restaurant</Text>
           )}
         </TouchableOpacity>
       </ScrollView>

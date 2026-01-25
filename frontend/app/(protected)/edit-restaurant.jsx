@@ -67,7 +67,7 @@ export default function EditRestaurantScreen() {
 
   const handleSubmit = () => {
     if (!name || !shortDescription || !longDescription || !address || !city || !latitude || !longitude) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
@@ -87,12 +87,12 @@ export default function EditRestaurantScreen() {
 
     updateMutation.mutate(updateData, {
       onSuccess: () => {
-        Alert.alert('Succès', 'Restaurant modifié avec succès', [
+        Alert.alert('Success', 'Restaurant updated successfully', [
           { text: 'OK', onPress: () => router.back() },
         ]);
       },
       onError: (error) => {
-        Alert.alert('Erreur', error.response?.data?.error || 'Impossible de modifier le restaurant');
+        Alert.alert('Error', error.response?.data?.error || 'Unable to update the restaurant');
       },
     });
   };
@@ -117,7 +117,7 @@ export default function EditRestaurantScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Modifier le restaurant</Text>
+        <Text style={styles.headerTitle}>Edit restaurant</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -126,32 +126,32 @@ export default function EditRestaurantScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.section}>
-          <Text style={styles.label}>Nom *</Text>
+          <Text style={styles.label}>Name *</Text>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
-            placeholder="Nom du restaurant"
+            placeholder="Restaurant name"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Description courte *</Text>
+          <Text style={styles.label}>Short description *</Text>
           <TextInput
             style={styles.input}
             value={shortDescription}
             onChangeText={setShortDescription}
-            placeholder="Description brève"
+            placeholder="Brief description"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Description longue *</Text>
+          <Text style={styles.label}>Long description *</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={longDescription}
             onChangeText={setLongDescription}
-            placeholder="Description détaillée"
+            placeholder="Detailed description"
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -159,22 +159,22 @@ export default function EditRestaurantScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Adresse *</Text>
+          <Text style={styles.label}>Address *</Text>
           <TextInput
             style={styles.input}
             value={address}
             onChangeText={setAddress}
-            placeholder="Adresse complète"
+            placeholder="Full address"
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Ville *</Text>
+          <Text style={styles.label}>City *</Text>
           <TextInput
             style={styles.input}
             value={city}
             onChangeText={setCity}
-            placeholder="Ville"
+            placeholder="City"
           />
         </View>
 
@@ -215,7 +215,7 @@ export default function EditRestaurantScreen() {
               </View>
             )}
             <Text style={styles.imagePickerText}>
-              {image ? 'Changer l\'image' : 'Modifier l\'image (optionnel)'}
+              {image ? 'Change image' : 'Edit image (optional)'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -229,7 +229,7 @@ export default function EditRestaurantScreen() {
           {updateMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Enregistrer</Text>
+            <Text style={styles.submitButtonText}>Save</Text>
           )}
         </TouchableOpacity>
       </ScrollView>

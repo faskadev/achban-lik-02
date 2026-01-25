@@ -57,12 +57,12 @@ module.exports = (sequelize) => {
     }
   });
 
-  // Instance method to compare password
+  
   User.prototype.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
   };
 
-  // Instance method to exclude password from JSON
+
   User.prototype.toJSON = function() {
     const values = { ...this.get() };
     delete values.password;
